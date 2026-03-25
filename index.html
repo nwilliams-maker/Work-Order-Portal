@@ -97,7 +97,7 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="generateCertifiedLink()" class="w-full brand-gradient text-white font-black py-6 rounded-2xl shadow-xl text-xs uppercase tracking-[0.2em] hover:scale-[1.01] transition-all">Generate Authorization Link</button>
+                <button id="generateBtn" type="button" onclick="generateCertifiedLink()" class="w-full brand-gradient text-white font-black py-6 rounded-2xl shadow-xl text-xs uppercase tracking-[0.2em] hover:scale-[1.01] transition-all">Generate Authorization Link</button>
             </div>
 
             <div id="icMode" class="hidden space-y-10">
@@ -157,7 +157,7 @@
         let currentLocCount = 0, currentTaskCount = 0, currentKioskCount = 0;
         let allOnfleetMarkers = [];
         let currentGlobalRate = 30; 
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbwz7F7wnWnCbGABYaOxHYbNtSBueyl2ODVJW-doJMPlsUoQDMb3OhmVe57fkImI-dcF/exec"; 
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbxUWzGhW1RNOBjANMwvKUQhq7NhMP9ZP7nuj0Y1CFGaltu0oir3p9ELkZ6bYapa7HM/exec"; 
         const formspreeUrl = "https://formspree.io/f/meerlqll"; 
 
         const podData = {
@@ -266,8 +266,15 @@
 
         async function saveToDatabase() {
             const p = { email: document.getElementById('ic_email_setup').value, name: document.getElementById('ic_name_setup').value, address: document.getElementById('ic_address').value };
-            try { await fetch(webAppUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(p) }); alert("Database Updated"); document.getElementById('saveBtn').disabled = true; }
-            catch (e) { alert("Save failed"); }
+            try { 
+                await fetch(webAppUrl, { 
+                    method: 'POST', 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(p) 
+                }); 
+                alert("Database Updated"); 
+                document.getElementById('saveBtn').disabled = true; 
+            } catch (e) { alert("Save failed"); }
         }
 
         function handleManualEdit() {
@@ -462,7 +469,12 @@
             }, 800);
         }
 
-        function generateCertifiedLink() {
+        // DATABASE UPGRADE: Generates a tiny link and saves data safely in the backend
+        async function generateCertifiedLink() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.innerText = "SAVING ROUTE TO DATABASE...";
+
             try {
                 let selectedIds = [];
                 const locationLines = document.getElementById('locations').value.split('\n').filter(l => l.trim().length > 5);
@@ -476,45 +488,87 @@
 
                 const jobListOnly = locationLines.join('|');
                 const d = {
-                    icn: document.getElementById('ic_name_setup').value, ice: document.getElementById('ic_email_setup').value,
-                    wo: document.getElementById('task_num').value, due: document.getElementById('due_date').value,
-                    comp: document.getElementById('comp').value, mi: document.getElementById('mileage_display').innerText,
-                    time: document.getElementById('time_display').innerText, locs: window.optimizedSequence ? window.optimizedSequence.join('|') : "",
-                    lCnt: currentLocCount, tCnt: currentTaskCount, kCnt: currentKioskCount, jobOnly: jobListOnly,
-                    
+                    icn: document.getElementById('ic_name_setup').value, 
+                    ice: document.getElementById('ic_email_setup').value,
+                    wo: document.getElementById('task_num').value, 
+                    due: document.getElementById('due_date').value,
+                    comp: document.getElementById('comp').value, 
+                    mi: document.getElementById('mileage_display').innerText,
+                    time: document.getElementById('time_display').innerText, 
+                    locs: window.optimizedSequence ? window.optimizedSequence.join('|') : "",
+                    lCnt: currentLocCount, 
+                    tCnt: currentTaskCount, 
+                    kCnt: currentKioskCount, 
+                    jobOnly: jobListOnly,
                     phone: window.currentContractorPhone,
                     taskIds: uniqueIds.join(',') 
                 };
 
-                if (!d.ice || d.mi === "0.0") return alert("Data missing.");
-                const payload = btoa(unescape(encodeURIComponent(JSON.stringify(d))));
-                const link = `${window.location.origin}${window.location.pathname}?data=${payload}`;
-                const s = `Action Required: Terraboost Route Request | WO #${d.wo}`;
-                let emailDate = 'N/A';
-                if (d.due) {
-                    const parts = d.due.split('-');
-                    emailDate = parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : d.due;
+                if (!d.ice || d.mi === "0.0") {
+                    btn.disabled = false; btn.innerText = "Generate Authorization Link";
+                    return alert("Data missing. Please check email and map locations.");
                 }
-                const b = `Dear ${d.icn},\n\nRoute Summary:\n- Due Date: ${emailDate}\n- Locations: ${d.lCnt}\n- Tasks: ${d.tCnt}\n- Kiosk Installs: ${d.kCnt}\n- Mileage: ${d.mi} Miles\n- Compensation: $${d.comp}\n\nReview Link: ${link}`;
-                window.open(`mailto:${d.ice}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`);
-            } catch (err) { alert("Error generating link."); }
+
+                // POST the data to Google Sheets to save it permanently
+                const response = await fetch(webAppUrl, {
+                    method: 'POST',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "saveRoute", payload: d })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.routeId) {
+                    // Create the TINY link
+                    const tinyLink = `${window.location.origin}${window.location.pathname}?route=${result.routeId}`;
+                    
+                    const s = `Action Required: Terraboost Route Request | WO #${d.wo}`;
+                    let emailDate = d.due ? `${d.due.split('-')[1]}/${d.due.split('-')[2]}/${d.due.split('-')[0]}` : 'N/A';
+                    const b = `Dear ${d.icn},\n\nRoute Summary:\n- Due Date: ${emailDate}\n- Locations: ${d.lCnt}\n- Tasks: ${d.tCnt}\n- Kiosk Installs: ${d.kCnt}\n- Mileage: ${d.mi} Miles\n- Compensation: $${d.comp}\n\nReview Link: ${tinyLink}`;
+                    
+                    window.open(`mailto:${d.ice}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`);
+                    
+                    btn.innerText = "LINK GENERATED SAFELY";
+                    btn.classList.add('bg-emerald-600');
+                    setTimeout(() => { btn.disabled = false; btn.innerText = "Generate Authorization Link"; btn.classList.remove('bg-emerald-600'); }, 3000);
+                } else {
+                    throw new Error("Failed to save route to database.");
+                }
+                
+            } catch (err) { 
+                alert("Error saving route. Try again."); 
+                btn.disabled = false; btn.innerText = "Generate Authorization Link";
+            }
         }
 
-        window.onload = () => {
+        window.onload = async () => {
             initMap(); setDefaultDate();
-            const p = new URLSearchParams(window.location.search), r = p.get('data');
-            if (r) {
-                // NEW: Failsafe if the email client chopped your link!
+            
+            const p = new URLSearchParams(window.location.search);
+            const routeId = p.get('route'); // Looks for ?route=R-12345
+            
+            if (routeId) {
+                document.getElementById('setupFields').remove();
+                document.getElementById('icMode').classList.remove('hidden');
+                
+                // Show loading spinner
+                document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10"><div class="spinner mx-auto mb-4 border-blue-500"></div><p class="text-slate-500 font-bold animate-pulse">Loading Route Data...</p></div>`;
+                
                 try {
-                    const d = JSON.parse(decodeURIComponent(escape(atob(r))));
-                    window.payloadData = d;
-                    document.getElementById('setupFields').remove();
-                    document.getElementById('icMode').classList.remove('hidden');
-                    let displayDate = 'N/A';
-                    if (d.due) {
-                        const parts = d.due.split('-');
-                        displayDate = parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : d.due;
+                    // Ask the database for the route details
+                    const response = await fetch(`${webAppUrl}?action=getRoute&routeId=${routeId}`);
+                    const result = await response.json();
+                    
+                    if (result.error) {
+                        document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ ${result.error}</div>`;
+                        return;
                     }
+                    
+                    const d = result.payload;
+                    window.payloadData = d;
+                    
+                    let displayDate = d.due ? `${d.due.split('-')[1]}/${d.due.split('-')[2]}/${d.due.split('-')[0]}` : 'N/A';
+                    
                     document.getElementById('summaryZone').innerHTML = `
                         <div class="flex justify-between border-b pb-2 mb-2 font-bold uppercase text-[10px] tracking-widest text-slate-400"><span>Route Summary</span></div>
                         <div class="flex justify-between border-b pb-2 mb-2"><span>Contractor:</span> <span class="font-bold">${d.icn}</span></div>
@@ -527,7 +581,7 @@
                         <div class="flex justify-between border-t pt-2 mt-2 font-black text-xl text-emerald-600"><span>Total Comp:</span> <span>$${d.comp}</span></div>
                     `;
                 } catch (e) {
-                    alert("LINK BROKEN: The email link was cut off by your email app because there were too many tasks selected. Please use the Drag & Drop note method instead.");
+                    document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ Error connecting to database. Please refresh.</div>`;
                 }
             }
         };
@@ -631,6 +685,7 @@
                     document.getElementById('icMode').classList.add('hidden');
                     document.getElementById('successView').classList.remove('hidden');
 
+                    // Ultimate Auto-Assign: Sends specific IDs directly to the backend
                     if (decision === 'Accepted' && window.payloadData.phone && window.payloadData.taskIds) {
                         const assignUrl = `${webAppUrl}?action=assignTasks&phone=${encodeURIComponent(window.payloadData.phone)}&taskIds=${encodeURIComponent(window.payloadData.taskIds)}`;
                         fetch(assignUrl)
