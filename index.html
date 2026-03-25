@@ -41,8 +41,27 @@
         <form id="dispatchForm" class="p-8 md:p-12 space-y-10">
             <div id="setupFields" class="space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div><label>Dispatcher Email</label><input type="email" id="d_email" placeholder="installteam@terraboost.biz"></div>
-                    <div><label>Contractor Email</label><input type="email" id="ic_email_setup" placeholder="Enter email..." onblur="lookupContractor(this.value)"></div>
+                    
+                   <div>
+                        <label>Dispatcher Email</label>
+                        <select id="d_email">
+                            <option value="" disabled selected>Select dispatcher...</option>
+                            <option value="nwilliams@terraboost.biz">nwilliams@terraboost.biz</option>
+                            <option value="aengelhardt@terraboost.biz">aengelhardt@terraboost.biz</option>
+                            <option value="kgallardo@terraboost.biz">kgallardo@terraboost.biz</option>
+                            <option value="mespinoza@terraboost.biz">mespinoza@terraboost.biz</option>
+                            <option value="dborochov@terraboost.biz">dborochov@terraboost.biz</option>
+                            <option value="kheiden@terraboost.biz">kheiden@terraboost.biz</option>
+                            <option value="installteam@terraboost.biz">installteam@terraboost.biz</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>Contractor Email</label>
+                        <input type="email" id="ic_email_setup" list="ic_email_list" placeholder="Start typing email..." oninput="filterEmails(this.value)" onblur="lookupContractor(this.value)">
+                        <datalist id="ic_email_list"></datalist>
+                    </div>
+
                     <div><label>Contractor Name</label><input type="text" id="ic_name_setup" placeholder="Auto-filled"></div>
                     <div><label>Work Order #</label><input type="text" id="task_num" placeholder="TBM-XXXXX"></div>
                 </div>
@@ -157,7 +176,11 @@
         let currentLocCount = 0, currentTaskCount = 0, currentKioskCount = 0;
         let allOnfleetMarkers = [];
         let currentGlobalRate = 30; 
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbxUWzGhW1RNOBjANMwvKUQhq7NhMP9ZP7nuj0Y1CFGaltu0oir3p9ELkZ6bYapa7HM/exec"; 
+        
+        // NEW: Array to hold all emails for the smart search
+        let allContractorEmails = [];
+        
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbwz7F7wnWnCbGABYaOxHYbNtSBueyl2ODVJW-doJMPlsUoQDMb3OhmVe57fkImI-dcF/exec"; 
         const formspreeUrl = "https://formspree.io/f/meerlqll"; 
 
         const podData = {
@@ -207,6 +230,23 @@
             google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
                 processPolygonSelection(polygon);
                 drawingManager.setDrawingMode(null);
+            });
+        }
+
+        // NEW: Smart Search Function for Contractor Emails
+        function filterEmails(query) {
+            const datalist = document.getElementById('ic_email_list');
+            datalist.innerHTML = ''; // Clear the dropdown
+            
+            if (query.length < 2) return; // Don't show options until 2 characters are typed
+            
+            // Find matches and limit to 5 results
+            const matches = allContractorEmails.filter(email => email.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+            
+            matches.forEach(email => {
+                const opt = document.createElement('option');
+                opt.value = email;
+                datalist.appendChild(opt);
             });
         }
 
@@ -469,7 +509,6 @@
             }, 800);
         }
 
-        // DATABASE UPGRADE: Generates a tiny link and saves data safely in the backend
         async function generateCertifiedLink() {
             const btn = document.getElementById('generateBtn');
             btn.disabled = true;
@@ -509,22 +548,23 @@
                     return alert("Data missing. Please check email and map locations.");
                 }
 
-                // POST the data to Google Sheets to save it permanently
-                const response = await fetch(webAppUrl, {
-                    method: 'POST',
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: "saveRoute", payload: d })
-                });
+                const routeId = "R-" + Math.floor(10000 + Math.random() * 90000);
+                const payloadStr = JSON.stringify(d);
+
+                const saveUrl = `${webAppUrl}?action=saveRoute&routeId=${routeId}&icn=${encodeURIComponent(d.icn)}&ice=${encodeURIComponent(d.ice)}&wo=${encodeURIComponent(d.wo)}&payload=${encodeURIComponent(payloadStr)}`;
                 
+                const response = await fetch(saveUrl);
                 const result = await response.json();
                 
-                if (result.success && result.routeId) {
-                    // Create the TINY link
-                    const tinyLink = `${window.location.origin}${window.location.pathname}?route=${result.routeId}`;
+                if (result.success) {
+                    const tinyLink = `${window.location.origin}${window.location.pathname}?route=${routeId}`;
                     
                     const s = `Action Required: Terraboost Route Request | WO #${d.wo}`;
                     let emailDate = d.due ? `${d.due.split('-')[1]}/${d.due.split('-')[2]}/${d.due.split('-')[0]}` : 'N/A';
-                    const b = `Dear ${d.icn},\n\nRoute Summary:\n- Due Date: ${emailDate}\n- Locations: ${d.lCnt}\n- Tasks: ${d.tCnt}\n- Kiosk Installs: ${d.kCnt}\n- Mileage: ${d.mi} Miles\n- Compensation: $${d.comp}\n\nReview Link: ${tinyLink}`;
+                    
+                    const dispatcherEmail = document.getElementById('d_email').value;
+                    
+                    const b = `Dear ${d.icn},\n\nRoute Summary:\n- Due Date: ${emailDate}\n- Locations: ${d.lCnt}\n- Tasks: ${d.tCnt}\n- Kiosk Installs: ${d.kCnt}\n- Mileage: ${d.mi} Miles\n- Compensation: $${d.comp}\n\nReview Link: ${tinyLink}\n\nSent by: ${dispatcherEmail}`;
                     
                     window.open(`mailto:${d.ice}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`);
                     
@@ -532,57 +572,64 @@
                     btn.classList.add('bg-emerald-600');
                     setTimeout(() => { btn.disabled = false; btn.innerText = "Generate Authorization Link"; btn.classList.remove('bg-emerald-600'); }, 3000);
                 } else {
-                    throw new Error("Failed to save route to database.");
+                    throw new Error("Database rejected save.");
                 }
                 
             } catch (err) { 
-                alert("Error saving route. Try again."); 
+                alert("Error saving route. Please ensure you deployed a New Version of your Google Script."); 
                 btn.disabled = false; btn.innerText = "Generate Authorization Link";
             }
         }
 
-        window.onload = async () => {
+        window.onload = () => {
             initMap(); setDefaultDate();
             
+            // NEW: Fetch all contractor emails and store them invisibly in the background
+            fetch(`${webAppUrl}?action=getAllContractors`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.emails) {
+                        allContractorEmails = data.emails; // Holds the emails for the smart search
+                    }
+                }).catch(e => console.log("Silent error loading contractor emails", e));
+            
             const p = new URLSearchParams(window.location.search);
-            const routeId = p.get('route'); // Looks for ?route=R-12345
+            const routeId = p.get('route'); 
             
             if (routeId) {
                 document.getElementById('setupFields').remove();
                 document.getElementById('icMode').classList.remove('hidden');
                 
-                // Show loading spinner
                 document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10"><div class="spinner mx-auto mb-4 border-blue-500"></div><p class="text-slate-500 font-bold animate-pulse">Loading Route Data...</p></div>`;
                 
-                try {
-                    // Ask the database for the route details
-                    const response = await fetch(`${webAppUrl}?action=getRoute&routeId=${routeId}`);
-                    const result = await response.json();
-                    
-                    if (result.error) {
-                        document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ ${result.error}</div>`;
-                        return;
-                    }
-                    
-                    const d = result.payload;
-                    window.payloadData = d;
-                    
-                    let displayDate = d.due ? `${d.due.split('-')[1]}/${d.due.split('-')[2]}/${d.due.split('-')[0]}` : 'N/A';
-                    
-                    document.getElementById('summaryZone').innerHTML = `
-                        <div class="flex justify-between border-b pb-2 mb-2 font-bold uppercase text-[10px] tracking-widest text-slate-400"><span>Route Summary</span></div>
-                        <div class="flex justify-between border-b pb-2 mb-2"><span>Contractor:</span> <span class="font-bold">${d.icn}</span></div>
-                        <div class="flex justify-between text-blue-600 font-bold"><span>Work Order #:</span> <span>${d.wo}</span></div>
-                        <div class="flex justify-between"><span>Due Date:</span> <span class="font-bold">${displayDate}</span></div>
-                        <div class="flex justify-between"><span>Unique Locations:</span> <span class="font-bold">${d.lCnt}</span></div>
-                        <div class="flex justify-between"><span>Total Tasks:</span> <span class="font-bold">${d.tCnt}</span></div>
-                        <div class="flex justify-between text-emerald-600 font-bold"><span>Kiosk Installs:</span> <span>${d.kCnt}</span></div>
-                        <div class="flex justify-between"><span>Mileage:</span> <span>${d.mi} Miles</span></div>
-                        <div class="flex justify-between border-t pt-2 mt-2 font-black text-xl text-emerald-600"><span>Total Comp:</span> <span>$${d.comp}</span></div>
-                    `;
-                } catch (e) {
-                    document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ Error connecting to database. Please refresh.</div>`;
-                }
+                fetch(`${webAppUrl}?action=getRoute&routeId=${routeId}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.error) {
+                            document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ ${result.error}</div>`;
+                            return;
+                        }
+                        
+                        const d = result.payload;
+                        window.payloadData = d;
+                        
+                        let displayDate = d.due ? `${d.due.split('-')[1]}/${d.due.split('-')[2]}/${d.due.split('-')[0]}` : 'N/A';
+                        
+                        document.getElementById('summaryZone').innerHTML = `
+                            <div class="flex justify-between border-b pb-2 mb-2 font-bold uppercase text-[10px] tracking-widest text-slate-400"><span>Route Summary</span></div>
+                            <div class="flex justify-between border-b pb-2 mb-2"><span>Contractor:</span> <span class="font-bold">${d.icn}</span></div>
+                            <div class="flex justify-between text-blue-600 font-bold"><span>Work Order #:</span> <span>${d.wo}</span></div>
+                            <div class="flex justify-between"><span>Due Date:</span> <span class="font-bold">${displayDate}</span></div>
+                            <div class="flex justify-between"><span>Unique Locations:</span> <span class="font-bold">${d.lCnt}</span></div>
+                            <div class="flex justify-between"><span>Total Tasks:</span> <span class="font-bold">${d.tCnt}</span></div>
+                            <div class="flex justify-between text-emerald-600 font-bold"><span>Kiosk Installs:</span> <span>${d.kCnt}</span></div>
+                            <div class="flex justify-between"><span>Mileage:</span> <span>${d.mi} Miles</span></div>
+                            <div class="flex justify-between border-t pt-2 mt-2 font-black text-xl text-emerald-600"><span>Total Comp:</span> <span>$${d.comp}</span></div>
+                        `;
+                    })
+                    .catch(e => {
+                        document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ Error connecting to database. Please refresh.</div>`;
+                    });
             }
         };
 
@@ -685,7 +732,6 @@
                     document.getElementById('icMode').classList.add('hidden');
                     document.getElementById('successView').classList.remove('hidden');
 
-                    // Ultimate Auto-Assign: Sends specific IDs directly to the backend
                     if (decision === 'Accepted' && window.payloadData.phone && window.payloadData.taskIds) {
                         const assignUrl = `${webAppUrl}?action=assignTasks&phone=${encodeURIComponent(window.payloadData.phone)}&taskIds=${encodeURIComponent(window.payloadData.taskIds)}`;
                         fetch(assignUrl)
