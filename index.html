@@ -74,11 +74,16 @@
         .detail-data-table th { background: #e2e8f0; padding: 12px 15px; font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); text-align: left; }
         .detail-data-table td { padding: 12px 15px; font-size: 0.85rem; font-weight: 600; border-top: 1px solid #f1f5f9; }
 
+        /* Buttons */
         .btn-upload { background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 700; width: 100%; color: white; cursor: pointer; }
         .btn-save { background: var(--success); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 700; color: white; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
         .btn-merge { background: var(--warning); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; color: #1e293b; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
-        .unified-card { background: white; border-radius: 24px; padding: 2.5rem; border: 1px solid var(--card-border); }
         
+        .sync-panel { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-sync { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px; color: #cbd5e1; flex: 1; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-sync:hover { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3); }
+
+        .unified-card { background: white; border-radius: 24px; padding: 2.5rem; border: 1px solid var(--card-border); }
         .table-subtotal { background-color: rgba(37, 99, 235, 0.04); font-weight: 800; }
         .table-grandtotal { background-color: rgba(37, 99, 235, 0.08); font-weight: 800; border-top: 2px solid var(--accent); }
     </style>
@@ -87,12 +92,18 @@
 
 <div class="sidebar">
     <h2 class="fw-800 mb-4">OpsCenter</h2>
-    <label class="btn-upload text-center mb-2 d-block">Upload Report <input type="file" id="csvFile" hidden></label>
+    
+    <label class="btn-upload text-center mb-2 d-block">Upload CSV <input type="file" id="csvFile" accept=".csv" hidden></label>
     <button id="saveBtn" class="btn-save" onclick="persistCurrentReport()">💾 Save to Archive</button>
     <button id="mergeBtn" class="btn-merge" onclick="mergeSelectedReports()">🔗 Merge Selected</button>
     
+    <div class="sync-panel">
+        <button class="btn-sync" onclick="exportArchive()" title="Download your saved reports to share">📤 Export</button>
+        <label class="btn-sync m-0" title="Load a saved report file from a colleague">📥 Import <input type="file" id="importFile" accept=".json" hidden></label>
+    </div>
+    
     <div class="history-section">
-        <div class="history-title">Archived Reports</div>
+        <div class="history-title mt-2">Archived Reports</div>
         <div id="historyBadges"></div>
     </div>
     
@@ -170,7 +181,6 @@
     let currentData = null;
     let currentLabel = "";
     
-    // Attempt to extract the year from the raw dataset, fallback to current year
     function getYearFromData(data) {
         if (!data || data.length === 0) return new Date().getFullYear();
         for (let row of data) {
@@ -184,7 +194,9 @@
 
     $(document).ready(() => { loadFromStorage(); });
 
+    // Main CSV Upload
     document.getElementById('csvFile').addEventListener('change', function(e) {
+        if (!e.target.files[0]) return;
         Papa.parse(e.target.files[0], { header: true, skipEmptyLines: true, complete: function(r) { 
             currentData = r.data;
             currentLabel = generateDateLabel(currentData);
@@ -193,6 +205,46 @@
             $('.history-badge').removeClass('active-badge'); 
         }});
     });
+
+    // Import Archive Logic
+    document.getElementById('importFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const importedData = JSON.parse(event.target.result);
+                let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+                // Merge imported data with existing local storage safely
+                Object.assign(archive, importedData);
+                localStorage.setItem('opsArchive', JSON.stringify(archive));
+                loadFromStorage();
+                alert("Archive synchronized successfully!");
+            } catch (err) {
+                alert("Error importing file. Make sure you selected a valid OpsCenter JSON archive.");
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    // Export Archive Logic
+    function exportArchive() {
+        const archiveString = localStorage.getItem('opsArchive') || '{}';
+        if (archiveString === '{}') {
+            alert("Your archive is empty. Save some reports before exporting.");
+            return;
+        }
+        const blob = new Blob([archiveString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const dateStr = new Date().toISOString().split('T')[0];
+        a.download = `OpsCenter_Archive_${dateStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
 
     function parseDateSafe(dateString) {
         if (!dateString) return null;
@@ -291,17 +343,13 @@
 
         const sortableEntries = Object.keys(archive).map(label => {
             let sortDate;
-            
-            // If the label is just "February 2026", parse it directly
             if (label.match(/^[a-zA-Z]+ \d{4}$/)) {
                 sortDate = new Date(label);
             } else {
-                // If it's a range like "Feb 16 - Feb 22"
                 let firstPart = label.split('-')[0].trim();
                 let year = getYearFromData(archive[label]);
                 sortDate = new Date(`${firstPart}, ${year}`);
             }
-            
             if(isNaN(sortDate.getTime())) sortDate = new Date(); 
             return { label, sortDate };
         });
@@ -498,7 +546,7 @@
         let pillHtml = "";
         Object.entries(contractorMap).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name, stats], idx) => {
             const overallAvg = stats.uniqueVids.size > 0 ? Math.round(stats.totalPay / stats.uniqueVids.size) : 0;
-            pillHtml += `<div class="contractor-pill shadow-sm"><div class="contractor-header" onclick="toggleDrill(${idx})"><div class="contractor-name">${name}</div><div class="pill-stat"><span class="pill-label">Owner</span><span class="pill-val text-muted">${stats.dispatcher}</span></div><div class="pill-stat"><span class="pill-label">Sites</span><span class="pill-val">${stats.uniqueVids.size}</span></div><div class="pill-stat"><span class="pill-label">Pay</span><span class="pill-val text-primary">$${stats.totalPay.toLocaleString()}</span></div><div class="pill-stat"><span class="pill-label">Avg</span><span class="pill-val fw-800">$${overallAvg.toLocaleString()}</span></div></div><div class="contractor-details" id="drill-${idx}"><table class="detail-data-table shadow-sm"><thead><tr><th>Work Order #</th><th># of stops</th><th>Sum of Rate</th><th>Avg / Stop</th></tr></thead><tbody>${Object.entries(stats.jobs).map(([wo, job]) => `<tr><td>${wo}</td><td>${job.vids.size}</td><td>$${job.rate.toLocaleString()}</td><td class="fw-800">$${Math.round(job.rate / (job.vids.size || 1)).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>`;
+            pillHtml += `<div class="contractor-pill shadow-sm"><div class="contractor-header" onclick="toggleDrill(${idx})"><div class="contractor-name">${name}</div><div class="pill-stat"><span class="pill-label">Owner</span><span class="pill-val text-muted">${stats.dispatcher}</span></div><div class="pill-stat"><span class="pill-label">Sites</span><span class="pill-val">${stats.uniqueVids.size}</span></div><div class="pill-stat"><span class="pill-label">Pay</span><span class="pill-val text-primary">$${stats.totalPay.toLocaleString()}</span></div><div class="pill-stat"><span class="pill-label">Avg</span><span class="pill-val fw-800">$${overallAvg.toLocaleString()}</span></div></div><div class="contractor-details" id="drill-${idx}"><table class="detail-data-table shadow-sm"><thead><tr><th>Work Order #</th><th>Unique VIDs</th><th>Sum of Rate</th><th>Avg / Stop</th></tr></thead><tbody>${Object.entries(stats.jobs).map(([wo, job]) => `<tr><td>${wo}</td><td>${job.vids.size}</td><td>$${job.rate.toLocaleString()}</td><td class="fw-800">$${Math.round(job.rate / (job.vids.size || 1)).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>`;
         });
         $("#contractorList").html(pillHtml);
 
