@@ -13,12 +13,14 @@
             --card-border: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
-        .sidebar { width: 280px; background: var(--sidebar); color: white; min-height: 100vh; padding: 2.5rem; position: fixed; z-index: 1000; display: flex; flex-direction: column; }
+        
+        .sidebar { width: 280px; background: var(--sidebar); color: white; height: 100vh; padding: 2.5rem; position: fixed; z-index: 1000; display: flex; flex-direction: column; }
         .main { margin-left: 280px; padding: 2rem 4rem; }
         
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .period-pill { background: white; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--card-border); text-align: right; }
         .period-value { font-weight: 700; color: var(--accent); display: block; font-size: 0.95rem; }
+        
         .nav-container { margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0; }
         .nav-tabs { border: none; }
         .nav-tabs .nav-link { border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px 25px; cursor: pointer; }
@@ -33,8 +35,12 @@
         .fin-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; border-top: 1px solid #f1f5f9; padding-top: 2rem; }
         .kpi-card { background: white; border-radius: 24px; padding: 1.5rem; border: 1px solid var(--card-border); height: 100%; display: flex; flex-direction: column; justify-content: center; }
 
-        /* Categorized Accordion Sidebar with Merge UI */
-        .history-section { margin-top: 1.5rem; flex-grow: 1; overflow-y: auto; padding-right: 5px; }
+        .history-section { margin-top: 1.5rem; flex-grow: 1; overflow-y: auto; padding-right: 8px; min-height: 0; }
+        .history-section::-webkit-scrollbar { width: 5px; }
+        .history-section::-webkit-scrollbar-track { background: transparent; }
+        .history-section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+        .history-section::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
         .history-title { font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
         .month-group { margin-bottom: 0.5rem; }
         .month-header { 
@@ -57,10 +63,7 @@
         }
         .history-badge.active-badge { background: var(--accent); color: white; border-color: var(--accent); }
         .history-badge:hover:not(.active-badge) { background: rgba(255,255,255,0.1); color: white; }
-        .delete-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #ef4444; font-size: 1.1rem; display: none; cursor:pointer; font-weight: bold; }
-        .history-badge-container:hover .delete-btn { display: block; }
-
-        /* Drilldown UI */
+        
         .contractor-pill { background: white; border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; transition: all 0.2s ease; }
         .contractor-header { padding: 1.25rem 2rem; display: flex; align-items: center; cursor: pointer; background: white; }
         .contractor-header:hover { background: #f8fafc; }
@@ -75,10 +78,18 @@
         .detail-data-table td { padding: 12px 15px; font-size: 0.85rem; font-weight: 600; border-top: 1px solid #f1f5f9; }
 
         /* Buttons */
-        .btn-upload { background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 700; width: 100%; color: white; cursor: pointer; }
+        .btn-upload { background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 700; width: 100%; color: white; cursor: pointer; transition: all 0.2s; }
+        .btn-upload:hover { opacity: 0.9; }
+        .btn-batch { background: #475569; border: none; border-radius: 12px; padding: 10px; font-weight: 700; width: 100%; color: white; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+        .btn-batch:hover { background: #334155; }
         .btn-save { background: var(--success); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 700; color: white; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
-        .btn-merge { background: var(--warning); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; color: #1e293b; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
         
+        .selection-panel { display: flex; gap: 8px; margin-top: 10px; display: none; }
+        .btn-merge { background: var(--warning); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; color: #1e293b; cursor: pointer; flex: 1; font-size: 0.75rem; transition: all 0.2s; }
+        .btn-merge:hover { opacity: 0.8; }
+        .btn-danger-custom { background: var(--danger); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; color: white; cursor: pointer; flex: 1; font-size: 0.75rem; transition: all 0.2s; }
+        .btn-danger-custom:hover { opacity: 0.8; }
+
         .sync-panel { display: flex; gap: 8px; margin-top: 10px; }
         .btn-sync { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px; color: #cbd5e1; flex: 1; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
         .btn-sync:hover { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3); }
@@ -93,9 +104,15 @@
 <div class="sidebar">
     <h2 class="fw-800 mb-4">OpsCenter</h2>
     
-    <label class="btn-upload text-center mb-2 d-block">Upload CSV <input type="file" id="csvFile" accept=".csv" hidden></label>
+    <label class="btn-upload text-center mb-2 d-block">Upload Report <input type="file" id="csvFile" accept=".csv" hidden></label>
+    <label class="btn-batch text-center mb-2 d-block" title="Upload a massive CSV to auto-split it into weekly archived reports">📂 Batch Auto-Split <input type="file" id="batchCsvFile" accept=".csv" hidden></label>
+    
     <button id="saveBtn" class="btn-save" onclick="persistCurrentReport()">💾 Save to Archive</button>
-    <button id="mergeBtn" class="btn-merge" onclick="mergeSelectedReports()">🔗 Merge Selected</button>
+    
+    <div id="selectionPanel" class="selection-panel">
+        <button id="mergeBtn" class="btn-merge m-0" onclick="mergeSelectedReports()">🔗 Merge</button>
+        <button id="deleteBatchBtn" class="btn-danger-custom m-0" onclick="deleteSelectedReports()">🗑️ Delete</button>
+    </div>
     
     <div class="sync-panel">
         <button class="btn-sync" onclick="exportArchive()" title="Download your saved reports to share">📤 Export</button>
@@ -105,11 +122,6 @@
     <div class="history-section">
         <div class="history-title mt-2">Archived Reports</div>
         <div id="historyBadges"></div>
-    </div>
-    
-    <div style="margin-top: auto; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 20px;">
-        <div class="small fw-800 text-white text-opacity-50 mb-2 uppercase">FIXED CTE</div>
-        <div class="d-flex justify-content-between small"><span>Fleet/Payroll</span><span class="text-success fw-bold">$8,819</span></div>
     </div>
 </div>
 
@@ -137,8 +149,26 @@
                         <div id="bar-ic" class="cost-segment seg-ic"></div>
                     </div>
                     <div class="fin-stack">
-                        <div><span class="pill-label">Fixed CTE</span><span class="d-block fw-800 fs-4">$8,819</span><small id="faCostPerVisit" class="text-success fw-bold">Avg: $0</small></div>
-                        <div><span class="pill-label">IC Job Pay</span><span class="d-block fw-800 fs-4" id="totalIcPayments">$0</span><small id="icCostPerVisit" class="text-success fw-bold">Avg: $0</small></div>
+                        <div>
+                            <span class="pill-label">Fixed CTE Total</span>
+                            <span class="d-block fw-800 fs-4" id="mainCteDisplay">$0</span>
+                            <div style="font-size: 0.75rem; background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 10px 0;">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-muted fw-600">Fleet</span>
+                                    <span id="sb-fleet" class="fw-800">$0</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted fw-600">Payroll</span>
+                                    <span id="sb-payroll" class="fw-800">$0</span>
+                                </div>
+                            </div>
+                            <small id="faCostPerVisit" class="text-success fw-bold d-block mt-2">Avg: $0</small>
+                        </div>
+                        <div>
+                            <span class="pill-label">IC Job Pay</span>
+                            <span class="d-block fw-800 fs-4" id="totalIcPayments">$0</span>
+                            <small id="icCostPerVisit" class="text-success fw-bold d-block" style="margin-top: 68px;">Avg: $0</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -175,66 +205,163 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
 <script>
-    const CTE_TOTAL = 8819;
+    // ==========================================
+    // COST VARIABLES (EDIT THESE TO MATCH YOUR NUMBERS)
+    // ==========================================
+    const FLEET_COST = 2500;   
+    const PAYROLL_COST = 6319; 
+    const CTE_TOTAL = FLEET_COST + PAYROLL_COST; 
+    // ==========================================
+
     let currentData = null;
     let currentLabel = "";
     
-    function getYearFromData(data) {
-        if (!data || data.length === 0) return new Date().getFullYear();
-        for (let row of data) {
-            if (row['Date Visited']) {
-                const d = new Date(row['Date Visited'].trim());
-                if (!isNaN(d.getTime())) return d.getFullYear();
-            }
-        }
-        return new Date().getFullYear();
+    // Core Storage Functions
+    function getArchiveData() {
+        try {
+            let str = localStorage.getItem('opsArchive');
+            if (!str) return {};
+            if (str.startsWith('{')) return JSON.parse(str); 
+            let decompressed = LZString.decompressFromUTF16(str);
+            return decompressed ? JSON.parse(decompressed) : {};
+        } catch(e) { return {}; }
     }
 
-    $(document).ready(() => { loadFromStorage(); });
+    function saveArchiveData(obj) {
+        try {
+            let compressed = LZString.compressToUTF16(JSON.stringify(obj));
+            localStorage.setItem('opsArchive', compressed);
+            return true;
+        } catch(e) {
+            alert("Warning: Your browser's storage quota is completely full! You need to delete some old reports before you can save more.");
+            return false;
+        }
+    }
 
-    // Main CSV Upload
-    document.getElementById('csvFile').addEventListener('change', function(e) {
-        if (!e.target.files[0]) return;
-        Papa.parse(e.target.files[0], { header: true, skipEmptyLines: true, complete: function(r) { 
-            currentData = r.data;
-            currentLabel = generateDateLabel(currentData);
-            $('#saveBtn').fadeIn();
-            processData(currentData); 
-            $('.history-badge').removeClass('active-badge'); 
-        }});
+    $(document).ready(() => { 
+        loadFromStorage(); 
+        
+        // Populate Fixed CTE Values into the main card
+        $('#sb-fleet').text(`$${FLEET_COST.toLocaleString()}`);
+        $('#sb-payroll').text(`$${PAYROLL_COST.toLocaleString()}`);
+        $('#mainCteDisplay').text(`$${CTE_TOTAL.toLocaleString()}`);
     });
 
-    // Import Archive Logic
+    // Single Upload 
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+        if (!e.target.files[0]) return;
+        
+        Papa.parse(e.target.files[0], { 
+            header: true, skipEmptyLines: true, worker: true,
+            complete: function(r) { 
+                currentData = r.data;
+                currentLabel = generateDateLabel(currentData);
+                $('#saveBtn').fadeIn(); 
+                processData(currentData); 
+                $('.history-badge').removeClass('active-badge'); 
+                e.target.value = ''; 
+            }
+        });
+    });
+
+    // Batch Auto-Split Upload
+    document.getElementById('batchCsvFile').addEventListener('change', function(e) {
+        if (!e.target.files[0]) return;
+        
+        Papa.parse(e.target.files[0], { 
+            header: true, skipEmptyLines: true, worker: true,
+            complete: function(r) { 
+                batchProcessAndSplit(r.data);
+                e.target.value = ''; 
+            }
+        });
+    });
+
+    function parseDateSafe(dateString) {
+        if (!dateString) return null;
+        let trimmed = dateString.trim();
+        if (trimmed.length === 10) trimmed += 'T12:00:00';
+        let d = new Date(trimmed);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    function getWeeklyBucketLabel(dateString) {
+        const d = parseDateSafe(dateString);
+        if (!d) return null; 
+        
+        const startMonday = new Date(d);
+        const dayStart = startMonday.getDay();
+        startMonday.setDate(startMonday.getDate() - dayStart + (dayStart === 0 ? -6 : 1));
+
+        const endSunday = new Date(startMonday);
+        endSunday.setDate(startMonday.getDate() + 6);
+
+        const y1 = startMonday.getFullYear();
+        const y2 = endSunday.getFullYear();
+        const startStr = startMonday.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+        const endStr = endSunday.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+        
+        if (y1 === y2) {
+            return `${startStr} - ${endStr}, ${y2}`;
+        } else {
+            return `${startStr}, ${y1} - ${endStr}, ${y2}`;
+        }
+    }
+
+    function batchProcessAndSplit(data) {
+        let archive = getArchiveData();
+        let buckets = {};
+        let count = 0;
+
+        data.forEach(row => {
+            const label = getWeeklyBucketLabel(row['Date Visited']);
+            if (label) {
+                if (!buckets[label]) buckets[label] = [];
+                buckets[label].push(row);
+            }
+        });
+
+        Object.entries(buckets).forEach(([label, rows]) => {
+            archive[label] = rows; 
+            count++;
+        });
+
+        saveArchiveData(archive);
+        loadFromStorage();
+        alert(`Batch complete! Successfully compressed and auto-split massive report into ${count} weekly buckets.`);
+    }
+
     document.getElementById('importFile').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
+        
         const reader = new FileReader();
         reader.onload = function(event) {
             try {
                 const importedData = JSON.parse(event.target.result);
-                let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
-                // Merge imported data with existing local storage safely
+                let archive = getArchiveData();
                 Object.assign(archive, importedData);
-                localStorage.setItem('opsArchive', JSON.stringify(archive));
+                saveArchiveData(archive);
                 loadFromStorage();
                 alert("Archive synchronized successfully!");
             } catch (err) {
                 alert("Error importing file. Make sure you selected a valid OpsCenter JSON archive.");
             }
+            e.target.value = ''; 
         };
         reader.readAsText(file);
     });
 
-    // Export Archive Logic
     function exportArchive() {
-        const archiveString = localStorage.getItem('opsArchive') || '{}';
-        if (archiveString === '{}') {
+        const archive = getArchiveData();
+        if (Object.keys(archive).length === 0) {
             alert("Your archive is empty. Save some reports before exporting.");
             return;
         }
-        const blob = new Blob([archiveString], { type: "application/json" });
+        const blob = new Blob([JSON.stringify(archive)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -246,12 +373,15 @@
         URL.revokeObjectURL(url);
     }
 
-    function parseDateSafe(dateString) {
-        if (!dateString) return null;
-        let trimmed = dateString.trim();
-        if (trimmed.length === 10) trimmed += 'T12:00:00';
-        let d = new Date(trimmed);
-        return isNaN(d.getTime()) ? null : d;
+    function getYearFromData(data) {
+        if (!data || data.length === 0) return new Date().getFullYear();
+        for (let row of data) {
+            if (row['Date Visited']) {
+                const d = new Date(row['Date Visited'].trim());
+                if (!isNaN(d.getTime())) return d.getFullYear();
+            }
+        }
+        return new Date().getFullYear();
     }
 
     function generateDateLabel(data) {
@@ -269,48 +399,62 @@
         
         const startMonday = new Date(min);
         const dayStart = startMonday.getDay();
-        const diffStart = startMonday.getDate() - dayStart + (dayStart === 0 ? -6 : 1);
-        startMonday.setDate(diffStart);
+        startMonday.setDate(startMonday.getDate() - dayStart + (dayStart === 0 ? -6 : 1));
 
         const endSunday = new Date(max);
         const dayEnd = endSunday.getDay();
-        const diffEnd = endSunday.getDate() + (dayEnd === 0 ? 0 : 7 - dayEnd);
-        endSunday.setDate(diffEnd);
+        endSunday.setDate(endSunday.getDate() + (dayEnd === 0 ? 0 : 7 - dayEnd));
 
         const diffDays = Math.ceil((endSunday - startMonday) / (1000 * 60 * 60 * 24));
         
         if (diffDays > 8) {
-            if (min.getMonth() === max.getMonth()) {
+            if (min.getMonth() === max.getMonth() && min.getFullYear() === max.getFullYear()) {
                 return max.toLocaleString('default', { month: 'long', year: 'numeric' });
             } else {
-                return `${min.toLocaleString('default', { month: 'short' })} - ${max.toLocaleString('default', { month: 'short', year: 'numeric' })}`;
+                return `${min.toLocaleString('default', { month: 'short', year: 'numeric' })} - ${max.toLocaleString('default', { month: 'short', year: 'numeric' })}`;
             }
         }
 
-        return `${startMonday.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${endSunday.toLocaleDateString(undefined, {month:'short', day:'numeric'})}`;
+        const y1 = startMonday.getFullYear();
+        const y2 = endSunday.getFullYear();
+        const startStr = startMonday.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+        const endStr = endSunday.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+        
+        if (y1 === y2) {
+            return `${startStr} - ${endStr}, ${y2}`;
+        } else {
+            return `${startStr}, ${y1} - ${endStr}, ${y2}`;
+        }
     }
 
     function persistCurrentReport() {
         if (!currentData) return;
-        let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        let archive = getArchiveData();
         archive[currentLabel] = currentData;
-        localStorage.setItem('opsArchive', JSON.stringify(archive));
-        loadFromStorage();
-        $('#saveBtn').fadeOut();
-        $(`button:contains('${currentLabel}')`).addClass('active-badge');
+        if (saveArchiveData(archive)) {
+            loadFromStorage();
+            $('#saveBtn').fadeOut();
+            $(`button:contains('${currentLabel}')`).addClass('active-badge');
+        }
     }
 
-    function checkMergeState() {
+    function checkSelectionState() {
         const checkedCount = $('.merge-checkbox:checked').length;
         if (checkedCount >= 2) {
-            $('#mergeBtn').fadeIn(200);
+            $('#selectionPanel').fadeIn(200);
+            $('#mergeBtn').show();
+            $('#deleteBatchBtn').show();
+        } else if (checkedCount === 1) {
+            $('#selectionPanel').fadeIn(200);
+            $('#mergeBtn').hide();
+            $('#deleteBatchBtn').show();
         } else {
-            $('#mergeBtn').fadeOut(200);
+            $('#selectionPanel').fadeOut(200);
         }
     }
 
     function mergeSelectedReports() {
-        const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        const archive = getArchiveData();
         let merged = [];
         $('.merge-checkbox:checked').each(function() {
             const label = $(this).val();
@@ -324,11 +468,39 @@
             currentLabel = generateDateLabel(merged);
             
             $('.merge-checkbox').prop('checked', false);
-            $('#mergeBtn').hide();
+            $('#selectionPanel').hide();
             
             processData(currentData);
-            $('#saveBtn').fadeIn();
+            $('#saveBtn').fadeIn(); 
             $('.history-badge').removeClass('active-badge'); 
+        }
+    }
+
+    function deleteSelectedReports() {
+        const selectedLabels = [];
+        $('.merge-checkbox:checked').each(function() {
+            selectedLabels.push($(this).val());
+        });
+
+        if (selectedLabels.length === 0) return;
+
+        if(confirm(`Are you sure you want to permanently delete ${selectedLabels.length} selected report(s)?`)) {
+            let archive = getArchiveData();
+            let clearedCurrent = false;
+
+            selectedLabels.forEach(label => {
+                delete archive[label];
+                if (currentLabel === label) clearedCurrent = true;
+            });
+
+            saveArchiveData(archive);
+            
+            if (clearedCurrent) { 
+                currentLabel = ""; 
+                currentData = null; 
+            }
+            
+            loadFromStorage();
         }
     }
 
@@ -337,21 +509,36 @@
         $(iconElement).toggleClass('open');
     }
 
+    function getMajorityMonthDate(label) {
+        if (!label.includes('-')) return new Date(label);
+
+        let startStr = label.split('-')[0].trim();
+        let endStr = label.split('-')[1].trim();
+        
+        let yearMatch = endStr.match(/\d{4}/);
+        let year = yearMatch ? yearMatch[0] : new Date().getFullYear();
+        
+        let startDate;
+        if (startStr.match(/\d{4}/)) {
+            startDate = new Date(startStr);
+        } else {
+            startDate = new Date(`${startStr} ${year}`);
+        }
+        
+        if (isNaN(startDate.getTime())) return new Date();
+
+        let thursday = new Date(startDate);
+        thursday.setDate(thursday.getDate() + 3);
+        
+        return thursday;
+    }
+
     function loadFromStorage() {
-        const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        const archive = getArchiveData();
         const grouped = {};
 
         const sortableEntries = Object.keys(archive).map(label => {
-            let sortDate;
-            if (label.match(/^[a-zA-Z]+ \d{4}$/)) {
-                sortDate = new Date(label);
-            } else {
-                let firstPart = label.split('-')[0].trim();
-                let year = getYearFromData(archive[label]);
-                sortDate = new Date(`${firstPart}, ${year}`);
-            }
-            if(isNaN(sortDate.getTime())) sortDate = new Date(); 
-            return { label, sortDate };
+            return { label, sortDate: getMajorityMonthDate(label) };
         });
 
         sortableEntries.sort((a, b) => b.sortDate - a.sortDate);
@@ -383,9 +570,8 @@
                 const activeClass = (label === currentLabel) ? 'active-badge' : '';
                 html += `
                     <div class="history-badge-container">
-                        <input type="checkbox" class="merge-checkbox" value="${label}" onchange="checkMergeState()" title="Select to merge">
+                        <input type="checkbox" class="merge-checkbox" value="${label}" onchange="checkSelectionState()" title="Select">
                         <button class="history-badge ${activeClass}" onclick="loadArchivedReport('${label}', this)">${label}</button>
-                        <button class="delete-btn" title="Delete Report" onclick="deleteReport('${label}')">×</button>
                     </div>`;
             });
             
@@ -394,28 +580,18 @@
         });
 
         $("#historyBadges").html(html);
-        checkMergeState();
+        checkSelectionState(); 
     }
 
     function loadArchivedReport(label, btnElement) {
-        const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        const archive = getArchiveData();
         currentData = archive[label];
         currentLabel = label;
         processData(currentData);
-        $('#saveBtn').hide();
+        $('#saveBtn').hide(); 
         
         $('.history-badge').removeClass('active-badge');
         if(btnElement) $(btnElement).addClass('active-badge');
-    }
-
-    function deleteReport(label) {
-        if(confirm(`Are you sure you want to permanently delete the archived report for:\n${label}?`)) {
-            let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
-            delete archive[label];
-            localStorage.setItem('opsArchive', JSON.stringify(archive));
-            if (currentLabel === label) { currentLabel = ""; currentData = null; } 
-            loadFromStorage();
-        }
     }
 
     function switchTab(view) {
@@ -435,8 +611,15 @@
         if (!str || str.trim() === "") return 'Unassigned';
         let clean = str.replace(/ Total/g, '').trim();
         if (clean.includes("Karen") || clean.includes("Yusep")) return "Karen Heiden";
-        let people = clean.split(',');
-        return people[people.length - 1].trim();
+        
+        let people = clean.split(',').map(p => p.trim());
+        if (people.length > 1) {
+            const filtered = people.filter(p => !p.includes("Matt Shanks"));
+            if (filtered.length > 0) {
+                people = filtered;
+            }
+        }
+        return people[people.length - 1]; 
     }
 
     function processData(data) {
@@ -449,12 +632,16 @@
 
         data.forEach(row => {
             if (row['Owner'] === 'Grand Total') return;
-            const dispatcher = getDispatcherName(row['Owner']);
+            
+            const ownerRaw = row['Owner'] || "";
+            const dispatcher = getDispatcherName(ownerRaw);
             const assigned = (row['Assigned to'] || row['Technician'] || "").trim();
             const locKey = (row['street_address'] || row['Address'] || row['Venue Name'] || "").trim().toLowerCase();
             const wo = row['Work Order Number'] || row['WO #'] || row['Name'] || '--';
             const taskType = (row['task_type'] || row['Task Type'] || "").toLowerCase();
+            
             const isEscalationFlag = row['Escalation'] === 'Yes';
+            const hasMattShanks = ownerRaw.includes("Matt Shanks");
             
             if (!locKey) return;
             globalLocs.add(locKey);
@@ -472,7 +659,8 @@
                 const rate = Math.round(parseFloat((row['SUM of Rate'] || row['Rate'] || "0").toString().replace(/[$,]/g, ''))) || 0;
                 icJobPay += rate; 
 
-                const isEscalationOrRollout = isEscalationFlag || taskType.includes('escalation') || taskType.includes('kiosk install');
+                // ANY row involving Matt Shanks gets forced into Escalations
+                const isEscalationOrRollout = isEscalationFlag || taskType.includes('escalation') || taskType.includes('kiosk install') || hasMattShanks;
                 const group = isEscalationOrRollout ? 'escalations' : 'regular';
 
                 if (!ownerMap[group][dispatcher]) ownerMap[group][dispatcher] = { pay: 0, locs: new Set() };
@@ -511,10 +699,11 @@
         let ownerHtml = "";
         let grandTotalSites = 0, grandTotalPay = 0;
         
-        if (Object.keys(ownerMap.regular).length > 0) {
+        const validRegular = Object.entries(ownerMap.regular).filter(([n, d]) => d.pay > 0).sort((a,b)=>a[0].localeCompare(b[0]));
+        if (validRegular.length > 0) {
             ownerHtml += `<tr><td colspan="4" style="background:#f8fafc; font-size:0.65rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); padding:10px 15px;">Regular Routes</td></tr>`;
             let subSites = 0, subPay = 0;
-            Object.entries(ownerMap.regular).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([n, d]) => {
+            validRegular.forEach(([n, d]) => {
                 ownerHtml += `<tr><td>${n}</td><td class="text-center">${d.locs.size}</td><td class="text-primary">$${Math.round(d.pay).toLocaleString()}</td><td>$${Math.round(d.pay / (d.locs.size || 1)).toLocaleString()}</td></tr>`;
                 subSites += d.locs.size; subPay += d.pay;
             });
@@ -522,10 +711,11 @@
             grandTotalSites += subSites; grandTotalPay += subPay;
         }
         
-        if (Object.keys(ownerMap.escalations).length > 0) {
+        const validEscalations = Object.entries(ownerMap.escalations).filter(([n, d]) => d.pay > 0).sort((a,b)=>a[0].localeCompare(b[0]));
+        if (validEscalations.length > 0) {
             ownerHtml += `<tr><td colspan="4" style="background:#f8fafc; font-size:0.65rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); padding:10px 15px; border-top: 2px solid #e2e8f0;">Escalations & Rollouts</td></tr>`;
             let subSites = 0, subPay = 0;
-            Object.entries(ownerMap.escalations).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([n, d]) => {
+            validEscalations.forEach(([n, d]) => {
                 ownerHtml += `<tr><td>${n}</td><td class="text-center">${d.locs.size}</td><td class="text-primary">$${Math.round(d.pay).toLocaleString()}</td><td>$${Math.round(d.pay / (d.locs.size || 1)).toLocaleString()}</td></tr>`;
                 subSites += d.locs.size; subPay += d.pay;
             });
