@@ -24,31 +24,43 @@
         .nav-tabs .nav-link { border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px 25px; cursor: pointer; }
         .nav-tabs .nav-link.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: transparent; }
 
-        /* KPI Cards */
         .financial-master-card { background: white; border-radius: 30px; padding: 2.5rem; border: 1px solid var(--card-border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04); height: 100%; }
         .master-value { font-size: 3.5rem; font-weight: 800; color: var(--accent); letter-spacing: -0.05em; line-height: 1; margin-bottom: 0.5rem; display: block; }
         .cost-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: #e2e8f0; margin: 20px 0; }
         .cost-segment { transition: width 0.6s ease; }
-        .seg-cte { background: var(--sidebar); }
         .seg-ic { background: var(--accent); }
+        .seg-cte { background: var(--sidebar); }
         .fin-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; border-top: 1px solid #f1f5f9; padding-top: 2rem; }
         .kpi-card { background: white; border-radius: 24px; padding: 1.5rem; border: 1px solid var(--card-border); height: 100%; display: flex; flex-direction: column; justify-content: center; }
 
-        /* History Badges Styles */
-        .history-section { margin-top: 1.5rem; flex-grow: 1; overflow-y: auto; }
+        /* Categorized Accordion Sidebar with Merge UI */
+        .history-section { margin-top: 1.5rem; flex-grow: 1; overflow-y: auto; padding-right: 5px; }
         .history-title { font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
-        .history-badge-container { position: relative; margin-bottom: 8px; }
-        .history-badge { 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-            color: #cbd5e1; padding: 10px 14px; border-radius: 10px; font-size: 0.75rem; 
-            cursor: pointer; transition: all 0.2s; display: block;
-            text-decoration: none; font-weight: 600; width: 100%; text-align: left;
+        .month-group { margin-bottom: 0.5rem; }
+        .month-header { 
+            font-size: 0.7rem; font-weight: 800; color: white; text-transform: uppercase; 
+            padding: 10px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; 
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center; 
+            transition: background 0.2s; border: 1px solid rgba(255,255,255,0.05);
         }
-        .history-badge:hover { background: rgba(255,255,255,0.1); color: white; border-color: var(--accent); }
-        .delete-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #ef4444; font-size: 1rem; display: none; }
+        .month-header:hover { background: rgba(255,255,255,0.1); }
+        .toggle-icon { transition: transform 0.3s ease; font-size: 0.6rem; }
+        .toggle-icon.open { transform: rotate(180deg); }
+        .month-badges { padding-top: 6px; padding-left: 2px; display: none; }
+        
+        .history-badge-container { display: flex; align-items: center; position: relative; margin-bottom: 6px; }
+        .merge-checkbox { margin: 0 8px 0 0; cursor: pointer; width: 14px; height: 14px; flex-shrink: 0; accent-color: var(--accent); }
+        .history-badge { 
+            flex: 1; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); 
+            color: #cbd5e1; padding: 8px 12px; border-radius: 8px; font-size: 0.7rem; 
+            cursor: pointer; transition: all 0.2s; text-align: left; text-decoration: none; font-weight: 600;
+        }
+        .history-badge.active-badge { background: var(--accent); color: white; border-color: var(--accent); }
+        .history-badge:hover:not(.active-badge) { background: rgba(255,255,255,0.1); color: white; }
+        .delete-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #ef4444; font-size: 1.1rem; display: none; cursor:pointer; font-weight: bold; }
         .history-badge-container:hover .delete-btn { display: block; }
 
-        /* Drilldown Styles */
+        /* Drilldown UI */
         .contractor-pill { background: white; border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; transition: all 0.2s ease; }
         .contractor-header { padding: 1.25rem 2rem; display: flex; align-items: center; cursor: pointer; background: white; }
         .contractor-header:hover { background: #f8fafc; }
@@ -64,7 +76,11 @@
 
         .btn-upload { background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 700; width: 100%; color: white; cursor: pointer; }
         .btn-save { background: var(--success); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 700; color: white; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
+        .btn-merge { background: var(--warning); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; color: #1e293b; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
         .unified-card { background: white; border-radius: 24px; padding: 2.5rem; border: 1px solid var(--card-border); }
+        
+        .table-subtotal { background-color: rgba(37, 99, 235, 0.04); font-weight: 800; }
+        .table-grandtotal { background-color: rgba(37, 99, 235, 0.08); font-weight: 800; border-top: 2px solid var(--accent); }
     </style>
 </head>
 <body>
@@ -73,9 +89,10 @@
     <h2 class="fw-800 mb-4">OpsCenter</h2>
     <label class="btn-upload text-center mb-2 d-block">Upload Report <input type="file" id="csvFile" hidden></label>
     <button id="saveBtn" class="btn-save" onclick="persistCurrentReport()">💾 Save to Archive</button>
+    <button id="mergeBtn" class="btn-merge" onclick="mergeSelectedReports()">🔗 Merge Selected</button>
     
     <div class="history-section">
-        <div class="history-title">Persistent Archive</div>
+        <div class="history-title">Archived Reports</div>
         <div id="historyBadges"></div>
     </div>
     
@@ -102,7 +119,6 @@
         <div class="row g-4 mb-4">
             <div class="col-xl-7">
                 <div class="financial-master-card">
-                    <span class="pill-label">Total Operational Spend</span>
                     <span class="master-value" id="totalCombinedCost">$0</span>
                     <span class="fw-700">Combined Avg: <span id="trueAvgCost">$0</span> / Site</span>
                     <div class="cost-bar">
@@ -125,7 +141,15 @@
         </div>
         <div class="unified-card">
             <div class="row g-5">
-                <div class="col-lg-8 border-end"><h6 class="fw-800 mb-4 text-muted small text-uppercase">Dispatcher Summary (IC Only)</h6><table class="table align-middle"><thead><tr><th>Dispatcher</th><th class="text-center">Sites</th><th>Total Pay</th><th>Avg / Site</th></tr></thead><tbody id="ownerBody"></tbody></table></div>
+                <div class="col-lg-8 border-end">
+                    <h6 class="fw-800 mb-4 text-muted small text-uppercase">Dispatcher Summary (IC Only)</h6>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead><tr><th>Dispatcher</th><th class="text-center">Sites</th><th>Total Pay</th><th>Avg / Site</th></tr></thead>
+                            <tbody id="ownerBody"></tbody>
+                        </table>
+                    </div>
+                </div>
                 <div class="col-lg-4"><h6 class="fw-800 mb-4 text-muted small text-uppercase">Exception Breakdown</h6><div id="ex-summary"></div></div>
             </div>
         </div>
@@ -145,8 +169,19 @@
     const CTE_TOTAL = 8819;
     let currentData = null;
     let currentLabel = "";
+    
+    // Attempt to extract the year from the raw dataset, fallback to current year
+    function getYearFromData(data) {
+        if (!data || data.length === 0) return new Date().getFullYear();
+        for (let row of data) {
+            if (row['Date Visited']) {
+                const d = new Date(row['Date Visited'].trim());
+                if (!isNaN(d.getTime())) return d.getFullYear();
+            }
+        }
+        return new Date().getFullYear();
+    }
 
-    // On Load: Load from LocalStorage
     $(document).ready(() => { loadFromStorage(); });
 
     document.getElementById('csvFile').addEventListener('change', function(e) {
@@ -155,17 +190,52 @@
             currentLabel = generateDateLabel(currentData);
             $('#saveBtn').fadeIn();
             processData(currentData); 
+            $('.history-badge').removeClass('active-badge'); 
         }});
     });
 
+    function parseDateSafe(dateString) {
+        if (!dateString) return null;
+        let trimmed = dateString.trim();
+        if (trimmed.length === 10) trimmed += 'T12:00:00';
+        let d = new Date(trimmed);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
     function generateDateLabel(data) {
         const dates = [];
-        data.forEach(row => { if (row['Date Visited']) { const d = new Date(row['Date Visited']); if (!isNaN(d.getTime())) dates.push(d); } });
+        data.forEach(row => { 
+            const d = parseDateSafe(row['Date Visited']);
+            if (d) dates.push(d); 
+        });
+        
         if (dates.length === 0) return "Report " + new Date().toLocaleTimeString();
         dates.sort((a,b) => a - b);
-        const min = dates[0], max = dates[dates.length - 1];
-        const diff = Math.ceil(Math.abs(max - min) / (1000 * 60 * 60 * 24));
-        return diff <= 8 ? `${min.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${max.toLocaleDateString(undefined, {month:'short', day:'numeric'})}` : min.toLocaleString('default', { month: 'short', year: 'numeric' });
+        
+        const min = new Date(dates[0]);
+        const max = new Date(dates[dates.length - 1]);
+        
+        const startMonday = new Date(min);
+        const dayStart = startMonday.getDay();
+        const diffStart = startMonday.getDate() - dayStart + (dayStart === 0 ? -6 : 1);
+        startMonday.setDate(diffStart);
+
+        const endSunday = new Date(max);
+        const dayEnd = endSunday.getDay();
+        const diffEnd = endSunday.getDate() + (dayEnd === 0 ? 0 : 7 - dayEnd);
+        endSunday.setDate(diffEnd);
+
+        const diffDays = Math.ceil((endSunday - startMonday) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 8) {
+            if (min.getMonth() === max.getMonth()) {
+                return max.toLocaleString('default', { month: 'long', year: 'numeric' });
+            } else {
+                return `${min.toLocaleString('default', { month: 'short' })} - ${max.toLocaleString('default', { month: 'short', year: 'numeric' })}`;
+            }
+        }
+
+        return `${startMonday.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${endSunday.toLocaleDateString(undefined, {month:'short', day:'numeric'})}`;
     }
 
     function persistCurrentReport() {
@@ -175,31 +245,129 @@
         localStorage.setItem('opsArchive', JSON.stringify(archive));
         loadFromStorage();
         $('#saveBtn').fadeOut();
+        $(`button:contains('${currentLabel}')`).addClass('active-badge');
+    }
+
+    function checkMergeState() {
+        const checkedCount = $('.merge-checkbox:checked').length;
+        if (checkedCount >= 2) {
+            $('#mergeBtn').fadeIn(200);
+        } else {
+            $('#mergeBtn').fadeOut(200);
+        }
+    }
+
+    function mergeSelectedReports() {
+        const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        let merged = [];
+        $('.merge-checkbox:checked').each(function() {
+            const label = $(this).val();
+            if (archive[label]) {
+                merged = merged.concat(archive[label]);
+            }
+        });
+        
+        if (merged.length > 0) {
+            currentData = merged;
+            currentLabel = generateDateLabel(merged);
+            
+            $('.merge-checkbox').prop('checked', false);
+            $('#mergeBtn').hide();
+            
+            processData(currentData);
+            $('#saveBtn').fadeIn();
+            $('.history-badge').removeClass('active-badge'); 
+        }
+    }
+
+    function toggleMonth(monthId, iconElement) {
+        $(`#${monthId}`).slideToggle(200);
+        $(iconElement).toggleClass('open');
     }
 
     function loadFromStorage() {
         const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
-        let html = "";
-        Object.keys(archive).sort().reverse().forEach(label => {
-            html += `<div class="history-badge-container">
-                        <button class="history-badge" onclick="loadArchivedReport('${label}')">${label}</button>
-                        <button class="delete-btn" onclick="deleteReport('${label}')">×</button>
-                     </div>`;
+        const grouped = {};
+
+        const sortableEntries = Object.keys(archive).map(label => {
+            let sortDate;
+            
+            // If the label is just "February 2026", parse it directly
+            if (label.match(/^[a-zA-Z]+ \d{4}$/)) {
+                sortDate = new Date(label);
+            } else {
+                // If it's a range like "Feb 16 - Feb 22"
+                let firstPart = label.split('-')[0].trim();
+                let year = getYearFromData(archive[label]);
+                sortDate = new Date(`${firstPart}, ${year}`);
+            }
+            
+            if(isNaN(sortDate.getTime())) sortDate = new Date(); 
+            return { label, sortDate };
         });
+
+        sortableEntries.sort((a, b) => b.sortDate - a.sortDate);
+
+        sortableEntries.forEach(entry => {
+            const monthYear = entry.sortDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+            if (!grouped[monthYear]) grouped[monthYear] = [];
+            grouped[monthYear].push(entry.label);
+        });
+
+        let html = "";
+        let isFirst = true;
+
+        Object.entries(grouped).forEach(([monthTitle, labels], index) => {
+            const monthId = `month-${index}`;
+            const isOpen = labels.includes(currentLabel) || (isFirst && !currentLabel);
+            const displayStyle = isOpen ? 'block' : 'none';
+            const iconClass = isOpen ? 'toggle-icon open' : 'toggle-icon';
+
+            html += `
+                <div class="month-group">
+                    <div class="month-header" onclick="toggleMonth('${monthId}', this.querySelector('.toggle-icon'))">
+                        ${monthTitle} <span class="${iconClass}">▼</span>
+                    </div>
+                    <div class="month-badges" id="${monthId}" style="display: ${displayStyle};">
+            `;
+            
+            labels.forEach(label => {
+                const activeClass = (label === currentLabel) ? 'active-badge' : '';
+                html += `
+                    <div class="history-badge-container">
+                        <input type="checkbox" class="merge-checkbox" value="${label}" onchange="checkMergeState()" title="Select to merge">
+                        <button class="history-badge ${activeClass}" onclick="loadArchivedReport('${label}', this)">${label}</button>
+                        <button class="delete-btn" title="Delete Report" onclick="deleteReport('${label}')">×</button>
+                    </div>`;
+            });
+            
+            html += `</div></div>`;
+            isFirst = false;
+        });
+
         $("#historyBadges").html(html);
+        checkMergeState();
     }
 
-    function loadArchivedReport(label) {
+    function loadArchivedReport(label, btnElement) {
         const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
         currentData = archive[label];
+        currentLabel = label;
         processData(currentData);
+        $('#saveBtn').hide();
+        
+        $('.history-badge').removeClass('active-badge');
+        if(btnElement) $(btnElement).addClass('active-badge');
     }
 
     function deleteReport(label) {
-        let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
-        delete archive[label];
-        localStorage.setItem('opsArchive', JSON.stringify(archive));
-        loadFromStorage();
+        if(confirm(`Are you sure you want to permanently delete the archived report for:\n${label}?`)) {
+            let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+            delete archive[label];
+            localStorage.setItem('opsArchive', JSON.stringify(archive));
+            if (currentLabel === label) { currentLabel = ""; currentData = null; } 
+            loadFromStorage();
+        }
     }
 
     function switchTab(view) {
@@ -224,8 +392,10 @@
     }
 
     function processData(data) {
+        if (!data) return;
         let icJobPay = 0, escCount = 0;
-        const ownerMap = {}, globalLocs = new Set(), icLocs = new Set(), faLocs = new Set(), dates = [];
+        const ownerMap = { regular: {}, escalations: {} }; 
+        const globalLocs = new Set(), icLocs = new Set(), faLocs = new Set(), dates = [];
         const exMap = { "Venue Closed": 0, "Kiosk Missing": 0, "Refusal": 0, "Damaged": 0 };
         const contractorMap = {};
 
@@ -235,35 +405,40 @@
             const assigned = (row['Assigned to'] || row['Technician'] || "").trim();
             const locKey = (row['street_address'] || row['Address'] || row['Venue Name'] || "").trim().toLowerCase();
             const wo = row['Work Order Number'] || row['WO #'] || row['Name'] || '--';
+            const taskType = (row['task_type'] || row['Task Type'] || "").toLowerCase();
+            const isEscalationFlag = row['Escalation'] === 'Yes';
+            
             if (!locKey) return;
-
             globalLocs.add(locKey);
-            const dStr = row['Date Visited'];
-            if (dStr) { const d = new Date(dStr); if (!isNaN(d.getTime())) dates.push(d); }
+            
+            const d = parseDateSafe(row['Date Visited']);
+            if (d) dates.push(d);
 
             const icfa = (row['IC/FA'] || row['Customer Type'] || "").trim().toUpperCase();
             const isFA = (icfa === "FA");
 
-            if (isFA) { faLocs.add(locKey); } else { 
+            if (isFA) { 
+                faLocs.add(locKey); 
+            } else { 
                 icLocs.add(locKey); 
                 const rate = Math.round(parseFloat((row['SUM of Rate'] || row['Rate'] || "0").toString().replace(/[$,]/g, ''))) || 0;
                 icJobPay += rate; 
 
-                if (assigned !== "" && assigned.toLowerCase() !== "unassigned") {
-                    if (!ownerMap[dispatcher]) ownerMap[dispatcher] = { pay: 0, locs: new Set() };
-                    ownerMap[dispatcher].pay += rate;
-                    ownerMap[dispatcher].locs.add(locKey);
+                const isEscalationOrRollout = isEscalationFlag || taskType.includes('escalation') || taskType.includes('kiosk install');
+                const group = isEscalationOrRollout ? 'escalations' : 'regular';
 
+                if (!ownerMap[group][dispatcher]) ownerMap[group][dispatcher] = { pay: 0, locs: new Set() };
+                ownerMap[group][dispatcher].pay += rate; 
+                ownerMap[group][dispatcher].locs.add(locKey);
+
+                if (assigned !== "" && assigned.toLowerCase() !== "unassigned") {
                     if (!contractorMap[assigned]) { contractorMap[assigned] = { dispatcher: dispatcher, totalPay: 0, uniqueVids: new Set(), jobs: {} }; }
-                    contractorMap[assigned].totalPay += rate;
-                    contractorMap[assigned].uniqueVids.add(locKey);
+                    contractorMap[assigned].totalPay += rate; contractorMap[assigned].uniqueVids.add(locKey);
                     if (!contractorMap[assigned].jobs[wo]) { contractorMap[assigned].jobs[wo] = { vids: new Set(), rate: 0 }; }
-                    contractorMap[assigned].jobs[wo].vids.add(locKey);
-                    contractorMap[assigned].jobs[wo].rate += rate;
+                    contractorMap[assigned].jobs[wo].vids.add(locKey); contractorMap[assigned].jobs[wo].rate += rate;
                 }
             }
-
-            if (row['Escalation'] === 'Yes' || (row['task_type'] || '').includes('Escalation')) escCount++;
+            if (isEscalationFlag || taskType.includes('escalation')) escCount++;
             const exR = (row['Exception Reason'] || "").toLowerCase();
             if (exR.includes("closed")) exMap["Venue Closed"]++;
             else if (exR.includes("missing")) exMap["Kiosk Missing"]++;
@@ -273,7 +448,6 @@
 
         const combinedTotal = CTE_TOTAL + icJobPay;
         const totalSites = globalLocs.size || 1;
-
         $("#totalCombinedCost").text(`$${Math.round(combinedTotal).toLocaleString()}`);
         $("#trueAvgCost").text(`$${Math.round(combinedTotal / totalSites).toLocaleString()}`);
         $("#totalIcPayments").text(`$${Math.round(icJobPay).toLocaleString()}`);
@@ -286,26 +460,50 @@
         $("#escCount").text(escCount);
         $("#exceptionTotal").text(Object.values(exMap).reduce((a,b)=>a+b,0));
         
-        $("#ownerBody").html(Object.entries(ownerMap).map(([n, d]) => `<tr><td>${n}</td><td class="text-center">${d.locs.size}</td><td class="text-primary">$${Math.round(d.pay).toLocaleString()}</td><td>$${Math.round(d.pay / (d.locs.size || 1)).toLocaleString()}</td></tr>`).join(''));
+        let ownerHtml = "";
+        let grandTotalSites = 0, grandTotalPay = 0;
+        
+        if (Object.keys(ownerMap.regular).length > 0) {
+            ownerHtml += `<tr><td colspan="4" style="background:#f8fafc; font-size:0.65rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); padding:10px 15px;">Regular Routes</td></tr>`;
+            let subSites = 0, subPay = 0;
+            Object.entries(ownerMap.regular).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([n, d]) => {
+                ownerHtml += `<tr><td>${n}</td><td class="text-center">${d.locs.size}</td><td class="text-primary">$${Math.round(d.pay).toLocaleString()}</td><td>$${Math.round(d.pay / (d.locs.size || 1)).toLocaleString()}</td></tr>`;
+                subSites += d.locs.size; subPay += d.pay;
+            });
+            ownerHtml += `<tr class="table-subtotal"><td class="text-end" style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted);">Regular Subtotal:</td><td class="text-center">${subSites}</td><td class="text-primary">$${Math.round(subPay).toLocaleString()}</td><td>$${Math.round(subPay / (subSites || 1)).toLocaleString()}</td></tr>`;
+            grandTotalSites += subSites; grandTotalPay += subPay;
+        }
+        
+        if (Object.keys(ownerMap.escalations).length > 0) {
+            ownerHtml += `<tr><td colspan="4" style="background:#f8fafc; font-size:0.65rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); padding:10px 15px; border-top: 2px solid #e2e8f0;">Escalations & Rollouts</td></tr>`;
+            let subSites = 0, subPay = 0;
+            Object.entries(ownerMap.escalations).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([n, d]) => {
+                ownerHtml += `<tr><td>${n}</td><td class="text-center">${d.locs.size}</td><td class="text-primary">$${Math.round(d.pay).toLocaleString()}</td><td>$${Math.round(d.pay / (d.locs.size || 1)).toLocaleString()}</td></tr>`;
+                subSites += d.locs.size; subPay += d.pay;
+            });
+            ownerHtml += `<tr class="table-subtotal"><td class="text-end" style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted);">Escalations Subtotal:</td><td class="text-center">${subSites}</td><td class="text-primary">$${Math.round(subPay).toLocaleString()}</td><td>$${Math.round(subPay / (subSites || 1)).toLocaleString()}</td></tr>`;
+            grandTotalSites += subSites; grandTotalPay += subPay;
+        }
+
+        if (grandTotalSites > 0) {
+            ownerHtml += `<tr class="table-grandtotal"><td class="text-end" style="font-size:0.85rem; text-transform:uppercase;">GRAND TOTAL:</td><td class="text-center">${grandTotalSites}</td><td class="text-primary">$${Math.round(grandTotalPay).toLocaleString()}</td><td>$${Math.round(grandTotalPay / (grandTotalSites || 1)).toLocaleString()}</td></tr>`;
+        }
+
+        $("#ownerBody").html(ownerHtml);
+        
         let exHtml = "";
-        Object.entries(exMap).forEach(([k,v]) => {
-            exHtml += `<div style="display:flex; justify-content:space-between; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:6px;"><span class="small fw-bold text-muted">${k}</span><span class="fw-800 text-danger">${v}</span></div>`;
-        });
+        Object.entries(exMap).forEach(([k,v]) => { exHtml += `<div style="display:flex; justify-content:space-between; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:6px;"><span class="small fw-bold text-muted">${k}</span><span class="fw-800 text-danger">${v}</span></div>`; });
         $("#ex-summary").html(exHtml);
 
         let pillHtml = "";
         Object.entries(contractorMap).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name, stats], idx) => {
             const overallAvg = stats.uniqueVids.size > 0 ? Math.round(stats.totalPay / stats.uniqueVids.size) : 0;
-            pillHtml += `<div class="contractor-pill shadow-sm"><div class="contractor-header" onclick="toggleDrill(${idx})"><div class="contractor-name">${name}</div><div class="pill-stat"><span class="pill-label">Owner</span><span class="pill-val text-muted">${stats.dispatcher}</span></div><div class="pill-stat"><span class="pill-label">Sites</span><span class="pill-val">${stats.uniqueVids.size}</span></div><div class="pill-stat"><span class="pill-label">Pay</span><span class="pill-val text-primary">$${stats.totalPay.toLocaleString()}</span></div><div class="pill-stat"><span class="pill-label">Avg</span><span class="pill-val fw-800">$${overallAvg.toLocaleString()}</span></div></div><div class="contractor-details" id="drill-${idx}"><table class="detail-data-table shadow-sm"><thead><tr><th>Work Order #</th><th>Unique VIDs</th><th>Sum of Rate</th><th>Avg / Stop</th></tr></thead><tbody>${Object.entries(stats.jobs).map(([wo, job]) => `<tr><td>${wo}</td><td>${job.vids.size}</td><td>$${job.rate.toLocaleString()}</td><td class="fw-800">$${Math.round(job.rate / (job.vids.size || 1)).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>`;
+            pillHtml += `<div class="contractor-pill shadow-sm"><div class="contractor-header" onclick="toggleDrill(${idx})"><div class="contractor-name">${name}</div><div class="pill-stat"><span class="pill-label">Owner</span><span class="pill-val text-muted">${stats.dispatcher}</span></div><div class="pill-stat"><span class="pill-label">Sites</span><span class="pill-val">${stats.uniqueVids.size}</span></div><div class="pill-stat"><span class="pill-label">Pay</span><span class="pill-val text-primary">$${stats.totalPay.toLocaleString()}</span></div><div class="pill-stat"><span class="pill-label">Avg</span><span class="pill-val fw-800">$${overallAvg.toLocaleString()}</span></div></div><div class="contractor-details" id="drill-${idx}"><table class="detail-data-table shadow-sm"><thead><tr><th>Work Order #</th><th># of stops</th><th>Sum of Rate</th><th>Avg / Stop</th></tr></thead><tbody>${Object.entries(stats.jobs).map(([wo, job]) => `<tr><td>${wo}</td><td>${job.vids.size}</td><td>$${job.rate.toLocaleString()}</td><td class="fw-800">$${Math.round(job.rate / (job.vids.size || 1)).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>`;
         });
         $("#contractorList").html(pillHtml);
 
-        if (dates.length > 0) {
-            dates.sort((a,b) => a - b);
-            const min = dates[0], max = dates[dates.length - 1];
-            document.getElementById('datePill').style.display = 'block';
-            document.getElementById('periodValueText').innerText = `${min.toLocaleDateString()} - ${max.toLocaleDateString()}`;
-        }
+        document.getElementById('datePill').style.display = 'block';
+        document.getElementById('periodValueText').innerText = currentLabel;
     }
 </script>
 </body>
