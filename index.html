@@ -3,757 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Order Dispatch | Terraboost Media</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDYgNIGcfWPxoux2EILXr60ZK0fZYJPR4&libraries=geometry,drawing"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>OpsCenter Pro | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .brand-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .form-card { border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
-        #map { height: 600px; width: 100%; border-radius: 12px; border: 1px solid #e2e8f0; }
-        label { color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem; display: block; margin-bottom: 6px; }
-        input, textarea, select { border: 1px solid #cbd5e1; border-radius: 10px !important; padding: 12px; font-size: 14px; width: 100%; background: #ffffff; }
-        .signature-font { font-family: 'Dancing Script', cursive; font-size: 3rem; color: #0f172a; border-bottom: 2px solid #94a3b8; background: transparent; width: 100%; padding: 0; height: auto; line-height: 1; }
-        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #3b82f6; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .status-pill { border: 2px solid #e2e8f0; transition: all 0.2s; cursor: pointer; }
-        input[type="radio"]:checked + .status-pill { border-color: currentColor; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        @media print { .no-print { display: none !important; } }
+        :root { 
+            --bg: #f8fafc; --sidebar: #0f172a; --accent: #2563eb; 
+            --danger: #e11d48; --warning: #f59e0b; --success: #10b981;
+            --card-border: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
+        .sidebar { width: 280px; background: var(--sidebar); color: white; min-height: 100vh; padding: 2.5rem; position: fixed; z-index: 1000; display: flex; flex-direction: column; }
+        .main { margin-left: 280px; padding: 2rem 4rem; }
+        
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .period-pill { background: white; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--card-border); text-align: right; }
+        .period-value { font-weight: 700; color: var(--accent); display: block; font-size: 0.95rem; }
+        .nav-container { margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0; }
+        .nav-tabs { border: none; }
+        .nav-tabs .nav-link { border: none; color: var(--text-muted); font-weight: 700; font-size: 0.9rem; padding: 10px 25px; cursor: pointer; }
+        .nav-tabs .nav-link.active { color: var(--accent); border-bottom: 3px solid var(--accent); background: transparent; }
+
+        /* KPI Cards */
+        .financial-master-card { background: white; border-radius: 30px; padding: 2.5rem; border: 1px solid var(--card-border); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04); height: 100%; }
+        .master-value { font-size: 3.5rem; font-weight: 800; color: var(--accent); letter-spacing: -0.05em; line-height: 1; margin-bottom: 0.5rem; display: block; }
+        .cost-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: #e2e8f0; margin: 20px 0; }
+        .cost-segment { transition: width 0.6s ease; }
+        .seg-cte { background: var(--sidebar); }
+        .seg-ic { background: var(--accent); }
+        .fin-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; border-top: 1px solid #f1f5f9; padding-top: 2rem; }
+        .kpi-card { background: white; border-radius: 24px; padding: 1.5rem; border: 1px solid var(--card-border); height: 100%; display: flex; flex-direction: column; justify-content: center; }
+
+        /* History Badges Styles */
+        .history-section { margin-top: 1.5rem; flex-grow: 1; overflow-y: auto; }
+        .history-title { font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+        .history-badge-container { position: relative; margin-bottom: 8px; }
+        .history-badge { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            color: #cbd5e1; padding: 10px 14px; border-radius: 10px; font-size: 0.75rem; 
+            cursor: pointer; transition: all 0.2s; display: block;
+            text-decoration: none; font-weight: 600; width: 100%; text-align: left;
+        }
+        .history-badge:hover { background: rgba(255,255,255,0.1); color: white; border-color: var(--accent); }
+        .delete-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #ef4444; font-size: 1rem; display: none; }
+        .history-badge-container:hover .delete-btn { display: block; }
+
+        /* Drilldown Styles */
+        .contractor-pill { background: white; border: 1px solid var(--card-border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; transition: all 0.2s ease; }
+        .contractor-header { padding: 1.25rem 2rem; display: flex; align-items: center; cursor: pointer; background: white; }
+        .contractor-header:hover { background: #f8fafc; }
+        .contractor-name { font-weight: 800; font-size: 1.1rem; color: var(--accent); flex: 1; }
+        .pill-stat { text-align: center; padding: 0 1.5rem; border-left: 1px solid #f1f5f9; }
+        .pill-label { font-size: 0.6rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+        .pill-val { font-size: 1rem; font-weight: 700; display: block; }
+
+        .contractor-details { display: none; background: #f1f5f9; padding: 1.5rem 2rem; border-top: 1px solid #e2e8f0; }
+        .detail-data-table { width: 100%; background: white; border-radius: 12px; overflow: hidden; border-collapse: collapse; }
+        .detail-data-table th { background: #e2e8f0; padding: 12px 15px; font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); text-align: left; }
+        .detail-data-table td { padding: 12px 15px; font-size: 0.85rem; font-weight: 600; border-top: 1px solid #f1f5f9; }
+
+        .btn-upload { background: var(--accent); border: none; border-radius: 12px; padding: 14px; font-weight: 700; width: 100%; color: white; cursor: pointer; }
+        .btn-save { background: var(--success); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 700; color: white; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
+        .unified-card { background: white; border-radius: 24px; padding: 2.5rem; border: 1px solid var(--card-border); }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body>
 
-    <div id="captureArea" class="max-w-6xl mx-auto form-card bg-white border border-slate-200 text-slate-900">
-        <div class="brand-gradient p-10 text-white flex justify-between items-center no-print">
-            <div class="flex items-center gap-6">
-                <div class="bg-white p-2 rounded-lg shadow-inner">
-                    <div class="bg-slate-900 text-white font-black text-3xl px-4 py-2 rounded">TBM</div>
-                </div>
-                <div>
-                    <h1 class="text-3xl font-extrabold tracking-tight">Terraboost Media</h1>
-                    <p class="text-blue-400 text-xs uppercase font-black tracking-[0.2em] opacity-90">Route Authorization Portal</p>
-                </div>
-            </div>
-            <button type="button" onclick="clearFullForm()" class="text-[10px] text-red-400 font-bold border border-red-900/30 px-3 py-1 rounded hover:bg-red-500/10 transition-all">Reset Form</button>
-        </div>
+<div class="sidebar">
+    <h2 class="fw-800 mb-4">OpsCenter</h2>
+    <label class="btn-upload text-center mb-2 d-block">Upload Report <input type="file" id="csvFile" hidden></label>
+    <button id="saveBtn" class="btn-save" onclick="persistCurrentReport()">💾 Save to Archive</button>
+    
+    <div class="history-section">
+        <div class="history-title">Persistent Archive</div>
+        <div id="historyBadges"></div>
+    </div>
+    
+    <div style="margin-top: auto; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 20px;">
+        <div class="small fw-800 text-white text-opacity-50 mb-2 uppercase">FIXED CTE</div>
+        <div class="d-flex justify-content-between small"><span>Fleet/Payroll</span><span class="text-success fw-bold">$8,819</span></div>
+    </div>
+</div>
 
-        <form id="dispatchForm" class="p-8 md:p-12 space-y-10">
-            <div id="setupFields" class="space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    
-                   <div>
-                        <label>Dispatcher Email</label>
-                        <select id="d_email">
-                            <option value="" disabled selected>Select dispatcher...</option>
-                            <option value="nwilliams@terraboost.biz">nwilliams@terraboost.biz</option>
-                            <option value="aengelhardt@terraboost.biz">aengelhardt@terraboost.biz</option>
-                            <option value="kgallardo@terraboost.biz">kgallardo@terraboost.biz</option>
-                            <option value="mespinoza@terraboost.biz">mespinoza@terraboost.biz</option>
-                            <option value="dborochov@terraboost.biz">dborochov@terraboost.biz</option>
-                            <option value="kheiden@terraboost.biz">kheiden@terraboost.biz</option>
-                            <option value="installteam@terraboost.biz">installteam@terraboost.biz</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label>Contractor Email</label>
-                        <input type="email" id="ic_email_setup" list="ic_email_list" placeholder="Start typing email..." oninput="filterEmails(this.value)" onblur="lookupContractor(this.value)">
-                        <datalist id="ic_email_list"></datalist>
-                    </div>
+<div class="main">
+    <header class="header-bar">
+        <h1 class="fw-800 mb-0" id="mainTitle">Financial Command</h1>
+        <div id="datePill" class="period-pill" style="display:none;"><span class="period-value" id="periodValueText">--</span></div>
+    </header>
 
-                    <div><label>Contractor Name</label><input type="text" id="ic_name_setup" placeholder="Auto-filled"></div>
-                    <div><label>Work Order #</label><input type="text" id="task_num" placeholder="TBM-XXXXX"></div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="md:col-span-2 relative">
-                        <label>Contractor Home Address</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="ic_address" class="flex-grow" placeholder="Address..." oninput="handleManualEdit()" onchange="calculateLargeRoute()">
-                            <button type="button" id="saveBtn" onclick="saveToDatabase()" disabled class="opacity-30 grayscale cursor-not-allowed bg-emerald-600 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all">Save</button>
-                        </div>
-                    </div>
-                    <div><label>Compensation ($)</label><input type="number" id="comp" placeholder="0.00"></div>
-                    <div><label>Due Date</label><input type="date" id="due_date"></div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start border-t border-slate-100 pt-10">
-                    <div class="space-y-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex flex-col gap-1.5">
-                                <label class="text-blue-600 font-black tracking-widest uppercase text-[10px] mb-0">Task Locations</label>
-                                <div class="flex flex-col gap-1">
-                                    <span id="location_count_badge" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[10px] font-bold hidden w-fit">0 Locations | 0 Total Tasks</span>
-                                    <span id="kiosk_count_badge" class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold hidden w-fit">0 Kiosk Installs</span>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 items-center">
-                                <select id="podFilter" onchange="filterMapByPod()" class="w-auto py-1 px-2 text-[9px] font-black uppercase bg-white border border-slate-300 rounded shadow-sm text-slate-700 cursor-pointer outline-none">
-                                    <option value="All">🌎 All Pods</option>
-                                    <option value="Orange">🟠 Orange Pod</option>
-                                    <option value="Green">🟢 Green Pod</option>
-                                    <option value="Red">🔴 Red Pod</option>
-                                    <option value="Blue">🔵 Blue Pod</option>
-                                    <option value="Purple">🟣 Purple Pod</option>
-                                </select>
-                                <button type="button" onclick="confirmClearList()" class="bg-red-50 text-red-600 text-[9px] font-black px-2 py-1 rounded uppercase hover:bg-red-100 transition-all">🗑️ Clear</button>
-                                <button type="button" onclick="fetchOnfleetTasks(true)" class="bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded uppercase hover:bg-blue-700 transition-all shadow-sm">🔄 USA Map</button>
-                                <button type="button" onclick="fetchOnfleetTasks(false)" class="bg-emerald-600 text-white text-[9px] font-black px-3 py-1 rounded uppercase hover:bg-emerald-700 transition-all shadow-sm">📍 Sync 40 Miles</button>
-                            </div>
-                        </div>
-                        <textarea id="locations" rows="10" class="font-mono text-xs" placeholder="Select tasks by drawing on the map..." oninput="calculateLargeRoute()"></textarea>
-                        
-                        <div class="bg-slate-900 rounded-3xl p-8 text-white flex justify-between items-center shadow-2xl relative">
-                            <div id="loaderOverlay" class="absolute inset-0 bg-slate-900/90 hidden flex-col items-center justify-center gap-2"><div class="spinner"></div></div>
-                            <div><p class="text-slate-400 text-[10px] uppercase font-black tracking-widest">Mileage</p><span id="mileage_display" class="text-4xl font-black text-emerald-400">0.0</span></div>
-                            <div class="text-right"><p class="text-slate-400 text-[10px] uppercase font-black tracking-widest text-white">Est. Time</p><span id="time_display" class="text-4xl font-black text-blue-400">--</span></div>
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-[10px] font-bold text-slate-500 uppercase">Use the Polygon Tool (top center) to lasso tasks:</p>
-                        <div id="map"></div>
-                    </div>
-                </div>
-
-                <button id="generateBtn" type="button" onclick="generateCertifiedLink()" class="w-full brand-gradient text-white font-black py-6 rounded-2xl shadow-xl text-xs uppercase tracking-[0.2em] hover:scale-[1.01] transition-all">Generate Authorization Link</button>
-            </div>
-
-            <div id="icMode" class="hidden space-y-10">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    <div class="space-y-8">
-                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest border-b pb-4">Authorization Details</h3>
-                        <div class="space-y-6 no-print">
-                            <div>
-                                <button type="button" onclick="viewRoute(11)" class="w-full bg-slate-800 text-white font-black py-5 rounded-2xl shadow-lg uppercase tracking-widest text-xs">View Route Preview</button>
-                                <p class="text-[10px] text-slate-400 mt-2 text-center font-bold">View up to 9 stops</p>
-                            </div>
-                            <div>
-                                <button type="button" id="copyBtn" onclick="copyMapUrl()" class="w-full bg-white border-2 border-slate-200 text-slate-600 font-black py-4 rounded-xl text-[10px] uppercase tracking-[0.15em]">Copy Browser Link (Full Route)</button>
-                                <p class="text-[10px] text-slate-400 mt-2 text-center font-bold">View up to 20 stops</p>
-                            </div>
-                        </div>
-                        <div id="summaryZone" class="bg-slate-50 p-8 rounded-3xl border border-slate-100 shadow-sm text-sm"></div>
-                    </div>
-
-                    <div class="space-y-8 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-                        <div class="grid grid-cols-2 gap-4">
-                            <label class="relative">
-                                <input type="radio" name="ic_decision" value="Accepted" class="sr-only" checked onchange="toggleDecisionView()">
-                                <div class="status-pill text-center py-4 rounded-xl text-emerald-600 font-black text-[10px] uppercase tracking-widest">Accept</div>
-                            </label>
-                            <label class="relative">
-                                <input type="radio" name="ic_decision" value="Declined" class="sr-only" onchange="toggleDecisionView()">
-                                <div class="status-pill text-center py-4 rounded-xl text-red-600 font-black text-[10px] uppercase tracking-widest">Decline</div>
-                            </label>
-                        </div>
-
-                        <div id="reason_block" class="hidden animate-in fade-in slide-in-from-top-2 space-y-6">
-                            <div><label>Counter Offer ($)</label><input type="number" id="ic_counter_val" placeholder="0.00"></div>
-                            <div><label>Reason for Decline / Notes</label><textarea id="ic_notes" rows="3" placeholder="Provide details..."></textarea></div>
-                        </div>
-
-                        <div id="signature_block">
-                            <label class="text-blue-600 font-black mb-4 uppercase text-[10px]">Electronic Signature</label>
-                            <input type="text" id="typed_sig" placeholder="Click Here, Type Legal Name" class="signature-font border-none outline-none focus:ring-0" oninput="updateLiveSignature(this.value)">
-                            <div class="flex items-start gap-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-100 mt-6">
-                                <input type="checkbox" id="legal_consent" class="mt-1 h-6 w-6">
-                                <label for="legal_consent" class="normal-case font-bold text-[11px] text-slate-700 leading-relaxed">
-                                    I, <span id="live_sig_text" class="text-blue-800 font-black italic border-b-2 border-blue-200 px-1">________________</span>, hereby certify that I have reviewed the route and compensation.
-                                </label>
-                            </div>
-                        </div>
-                        <button type="button" id="submitBtn" onclick="submitToFormspree()" class="bg-blue-600 text-white font-black px-12 py-5 rounded-2xl shadow-xl text-xs uppercase tracking-widest w-full transition-all hover:bg-blue-700">Submit Response</button>
-                    </div>
-                </div>
-            </div>
-            <div id="successView" class="hidden text-center py-20"><div class="text-6xl mb-4">✅</div><h2 class="text-3xl font-black uppercase text-slate-900">Response Recorded</h2></div>
-        </form>
+    <div class="nav-container">
+        <ul class="nav nav-tabs">
+            <li class="nav-item"><a class="nav-link active" onclick="switchTab('command')">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" onclick="switchTab('details')">Dispatcher Detail</a></li>
+        </ul>
     </div>
 
-    <script>
-        let map, directionsService, directionsRenderer, inputTimer, drawingManager;
-        let currentLocCount = 0, currentTaskCount = 0, currentKioskCount = 0;
-        let allOnfleetMarkers = [];
-        let currentGlobalRate = 30; 
+    <div id="view-command">
+        <div class="row g-4 mb-4">
+            <div class="col-xl-7">
+                <div class="financial-master-card">
+                    <span class="pill-label">Total Operational Spend</span>
+                    <span class="master-value" id="totalCombinedCost">$0</span>
+                    <span class="fw-700">Combined Avg: <span id="trueAvgCost">$0</span> / Site</span>
+                    <div class="cost-bar">
+                        <div id="bar-cte" class="cost-segment seg-cte"></div>
+                        <div id="bar-ic" class="cost-segment seg-ic"></div>
+                    </div>
+                    <div class="fin-stack">
+                        <div><span class="pill-label">Fixed CTE</span><span class="d-block fw-800 fs-4">$8,819</span><small id="faCostPerVisit" class="text-success fw-bold">Avg: $0</small></div>
+                        <div><span class="pill-label">IC Job Pay</span><span class="d-block fw-800 fs-4" id="totalIcPayments">$0</span><small id="icCostPerVisit" class="text-success fw-bold">Avg: $0</small></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-5">
+                <div class="row g-4 h-100">
+                    <div class="col-6"><div class="kpi-card"><span class="pill-label">Unique Sites</span><span class="fs-2 fw-800" id="uniqueVisits">0</span><small id="visitSplit" class="text-muted">IC: 0 | FA: 0</small></div></div>
+                    <div class="col-6"><div class="kpi-card"><span class="pill-label">Escalations</span><span class="fs-2 fw-800 text-warning" id="escCount">0</span></div></div>
+                    <div class="col-12"><div class="kpi-card border-danger border-opacity-10"><span class="pill-label">Exceptions</span><span class="fs-2 fw-800 text-danger" id="exceptionTotal">0</span></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="unified-card">
+            <div class="row g-5">
+                <div class="col-lg-8 border-end"><h6 class="fw-800 mb-4 text-muted small text-uppercase">Dispatcher Summary (IC Only)</h6><table class="table align-middle"><thead><tr><th>Dispatcher</th><th class="text-center">Sites</th><th>Total Pay</th><th>Avg / Site</th></tr></thead><tbody id="ownerBody"></tbody></table></div>
+                <div class="col-lg-4"><h6 class="fw-800 mb-4 text-muted small text-uppercase">Exception Breakdown</h6><div id="ex-summary"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-details" style="display:none;">
+        <div id="contractorList">
+            <div class="text-center text-muted py-5">Upload a CSV to view contractor breakdowns.</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+
+<script>
+    const CTE_TOTAL = 8819;
+    let currentData = null;
+    let currentLabel = "";
+
+    // On Load: Load from LocalStorage
+    $(document).ready(() => { loadFromStorage(); });
+
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+        Papa.parse(e.target.files[0], { header: true, skipEmptyLines: true, complete: function(r) { 
+            currentData = r.data;
+            currentLabel = generateDateLabel(currentData);
+            $('#saveBtn').fadeIn();
+            processData(currentData); 
+        }});
+    });
+
+    function generateDateLabel(data) {
+        const dates = [];
+        data.forEach(row => { if (row['Date Visited']) { const d = new Date(row['Date Visited']); if (!isNaN(d.getTime())) dates.push(d); } });
+        if (dates.length === 0) return "Report " + new Date().toLocaleTimeString();
+        dates.sort((a,b) => a - b);
+        const min = dates[0], max = dates[dates.length - 1];
+        const diff = Math.ceil(Math.abs(max - min) / (1000 * 60 * 60 * 24));
+        return diff <= 8 ? `${min.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${max.toLocaleDateString(undefined, {month:'short', day:'numeric'})}` : min.toLocaleString('default', { month: 'short', year: 'numeric' });
+    }
+
+    function persistCurrentReport() {
+        if (!currentData) return;
+        let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        archive[currentLabel] = currentData;
+        localStorage.setItem('opsArchive', JSON.stringify(archive));
+        loadFromStorage();
+        $('#saveBtn').fadeOut();
+    }
+
+    function loadFromStorage() {
+        const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        let html = "";
+        Object.keys(archive).sort().reverse().forEach(label => {
+            html += `<div class="history-badge-container">
+                        <button class="history-badge" onclick="loadArchivedReport('${label}')">${label}</button>
+                        <button class="delete-btn" onclick="deleteReport('${label}')">×</button>
+                     </div>`;
+        });
+        $("#historyBadges").html(html);
+    }
+
+    function loadArchivedReport(label) {
+        const archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        currentData = archive[label];
+        processData(currentData);
+    }
+
+    function deleteReport(label) {
+        let archive = JSON.parse(localStorage.getItem('opsArchive') || '{}');
+        delete archive[label];
+        localStorage.setItem('opsArchive', JSON.stringify(archive));
+        loadFromStorage();
+    }
+
+    function switchTab(view) {
+        $('.nav-link').removeClass('active');
+        if(view === 'command') {
+            $('#view-command').show(); $('#view-details').hide();
+            $('#mainTitle').text('Financial Command'); $('.nav-link').first().addClass('active');
+        } else {
+            $('#view-command').hide(); $('#view-details').show();
+            $('#mainTitle').text('Dispatcher Detail'); $('.nav-link').last().addClass('active');
+        }
+    }
+
+    function toggleDrill(id) { $(`#drill-${id}`).slideToggle(200); }
+
+    function getDispatcherName(str) {
+        if (!str || str.trim() === "") return 'Unassigned';
+        let clean = str.replace(/ Total/g, '').trim();
+        if (clean.includes("Karen") || clean.includes("Yusep")) return "Karen Heiden";
+        let people = clean.split(',');
+        return people[people.length - 1].trim();
+    }
+
+    function processData(data) {
+        let icJobPay = 0, escCount = 0;
+        const ownerMap = {}, globalLocs = new Set(), icLocs = new Set(), faLocs = new Set(), dates = [];
+        const exMap = { "Venue Closed": 0, "Kiosk Missing": 0, "Refusal": 0, "Damaged": 0 };
+        const contractorMap = {};
+
+        data.forEach(row => {
+            if (row['Owner'] === 'Grand Total') return;
+            const dispatcher = getDispatcherName(row['Owner']);
+            const assigned = (row['Assigned to'] || row['Technician'] || "").trim();
+            const locKey = (row['street_address'] || row['Address'] || row['Venue Name'] || "").trim().toLowerCase();
+            const wo = row['Work Order Number'] || row['WO #'] || row['Name'] || '--';
+            if (!locKey) return;
+
+            globalLocs.add(locKey);
+            const dStr = row['Date Visited'];
+            if (dStr) { const d = new Date(dStr); if (!isNaN(d.getTime())) dates.push(d); }
+
+            const icfa = (row['IC/FA'] || row['Customer Type'] || "").trim().toUpperCase();
+            const isFA = (icfa === "FA");
+
+            if (isFA) { faLocs.add(locKey); } else { 
+                icLocs.add(locKey); 
+                const rate = Math.round(parseFloat((row['SUM of Rate'] || row['Rate'] || "0").toString().replace(/[$,]/g, ''))) || 0;
+                icJobPay += rate; 
+
+                if (assigned !== "" && assigned.toLowerCase() !== "unassigned") {
+                    if (!ownerMap[dispatcher]) ownerMap[dispatcher] = { pay: 0, locs: new Set() };
+                    ownerMap[dispatcher].pay += rate;
+                    ownerMap[dispatcher].locs.add(locKey);
+
+                    if (!contractorMap[assigned]) { contractorMap[assigned] = { dispatcher: dispatcher, totalPay: 0, uniqueVids: new Set(), jobs: {} }; }
+                    contractorMap[assigned].totalPay += rate;
+                    contractorMap[assigned].uniqueVids.add(locKey);
+                    if (!contractorMap[assigned].jobs[wo]) { contractorMap[assigned].jobs[wo] = { vids: new Set(), rate: 0 }; }
+                    contractorMap[assigned].jobs[wo].vids.add(locKey);
+                    contractorMap[assigned].jobs[wo].rate += rate;
+                }
+            }
+
+            if (row['Escalation'] === 'Yes' || (row['task_type'] || '').includes('Escalation')) escCount++;
+            const exR = (row['Exception Reason'] || "").toLowerCase();
+            if (exR.includes("closed")) exMap["Venue Closed"]++;
+            else if (exR.includes("missing")) exMap["Kiosk Missing"]++;
+            else if (exR.includes("refusal") || exR.includes("refused")) exMap["Refusal"]++;
+            else if (exR.includes("damaged")) exMap["Damaged"]++;
+        });
+
+        const combinedTotal = CTE_TOTAL + icJobPay;
+        const totalSites = globalLocs.size || 1;
+
+        $("#totalCombinedCost").text(`$${Math.round(combinedTotal).toLocaleString()}`);
+        $("#trueAvgCost").text(`$${Math.round(combinedTotal / totalSites).toLocaleString()}`);
+        $("#totalIcPayments").text(`$${Math.round(icJobPay).toLocaleString()}`);
+        $("#faCostPerVisit").text(`Avg: $${(faLocs.size > 0 ? Math.round(CTE_TOTAL / faLocs.size) : 0).toLocaleString()} / Site`);
+        $("#icCostPerVisit").text(`Avg: $${(icLocs.size > 0 ? Math.round(icJobPay / icLocs.size) : 0).toLocaleString()} / Site`);
+        $("#bar-cte").css('width', Math.round((CTE_TOTAL/combinedTotal)*100) + '%');
+        $("#bar-ic").css('width', Math.round((icJobPay/combinedTotal)*100) + '%');
+        $("#uniqueVisits").text(totalSites.toLocaleString());
+        $("#visitSplit").text(`IC: ${icLocs.size} | FA: ${faLocs.size}`);
+        $("#escCount").text(escCount);
+        $("#exceptionTotal").text(Object.values(exMap).reduce((a,b)=>a+b,0));
         
-        // NEW: Array to hold all emails for the smart search
-        let allContractorEmails = [];
-        
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbwz7F7wnWnCbGABYaOxHYbNtSBueyl2ODVJW-doJMPlsUoQDMb3OhmVe57fkImI-dcF/exec"; 
-        const formspreeUrl = "https://formspree.io/f/meerlqll"; 
+        $("#ownerBody").html(Object.entries(ownerMap).map(([n, d]) => `<tr><td>${n}</td><td class="text-center">${d.locs.size}</td><td class="text-primary">$${Math.round(d.pay).toLocaleString()}</td><td>$${Math.round(d.pay / (d.locs.size || 1)).toLocaleString()}</td></tr>`).join(''));
+        let exHtml = "";
+        Object.entries(exMap).forEach(([k,v]) => {
+            exHtml += `<div style="display:flex; justify-content:space-between; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:6px;"><span class="small fw-bold text-muted">${k}</span><span class="fw-800 text-danger">${v}</span></div>`;
+        });
+        $("#ex-summary").html(exHtml);
 
-        const podData = {
-            "AK": "Orange", "ALASKA": "Orange", "AZ": "Orange", "ARIZONA": "Orange", "CA": "Orange", "CALIFORNIA": "Orange", 
-            "HI": "Orange", "HAWAII": "Orange", "ID": "Orange", "IDAHO": "Orange", "NV": "Orange", "NEVADA": "Orange", 
-            "OR": "Orange", "OREGON": "Orange", "WA": "Orange", "WASHINGTON": "Orange",
-            
-            "CO": "Green", "COLORADO": "Green", "DC": "Green", "DISTRICT OF COLUMBIA": "Green", "WASHINGTON DC": "Green", 
-            "GA": "Green", "GEORGIA": "Green", "IN": "Green", "INDIANA": "Green", "KY": "Green", "KENTUCKY": "Green", 
-            "MD": "Green", "MARYLAND": "Green", "NJ": "Green", "NEW JERSEY": "Green", "OH": "Green", "OHIO": "Green", "UT": "Green", "UTAH": "Green",
-            
-            "CT": "Red", "CONNECTICUT": "Red", "DE": "Red", "DELAWARE": "Red", "MA": "Red", "MASSACHUSETTS": "Red", 
-            "ME": "Red", "MAINE": "Red", "NH": "Red", "NEW HAMPSHIRE": "Red", "NY": "Red", "NEW YORK": "Red", 
-            "PA": "Red", "PENNSYLVANIA": "Red", "RI": "Red", "RHODE ISLAND": "Red", "VA": "Red", "VIRGINIA": "Red", 
-            "VT": "Red", "VERMONT": "Red", "WV": "Red", "WEST VIRGINIA": "Red",
-            
-            "AL": "Blue", "ALABAMA": "Blue", "AR": "Blue", "ARKANSAS": "Blue", "FL": "Blue", "FLORIDA": "Blue", 
-            "IA": "Blue", "IOWA": "Blue", "IL": "Blue", "ILLINOIS": "Blue", "LA": "Blue", "LOUISIANA": "Blue", 
-            "MI": "Blue", "MICHIGAN": "Blue", "MN": "Blue", "MINNESOTA": "Blue", "MO": "Blue", "MISSOURI": "Blue", 
-            "MS": "Blue", "MISSISSIPPI": "Blue", "NC": "Blue", "NORTH CAROLINA": "Blue", "SC": "Blue", "SOUTH CAROLINA": "Blue", "WI": "Blue", "WISCONSIN": "Blue",
-            
-            "KS": "Purple", "KANSAS": "Purple", "MT": "Purple", "MONTANA": "Purple", "ND": "Purple", "NORTH DAKOTA": "Purple", 
-            "NE": "Purple", "NEBRASKA": "Purple", "NM": "Purple", "NEW MEXICO": "Purple", "OK": "Purple", "OKLAHOMA": "Purple", 
-            "SD": "Purple", "SOUTH DAKOTA": "Purple", "TN": "Purple", "TENNESSEE": "Purple", "TX": "Purple", "TEXAS": "Purple", "WY": "Purple", "WYOMING": "Purple"
-        };
+        let pillHtml = "";
+        Object.entries(contractorMap).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name, stats], idx) => {
+            const overallAvg = stats.uniqueVids.size > 0 ? Math.round(stats.totalPay / stats.uniqueVids.size) : 0;
+            pillHtml += `<div class="contractor-pill shadow-sm"><div class="contractor-header" onclick="toggleDrill(${idx})"><div class="contractor-name">${name}</div><div class="pill-stat"><span class="pill-label">Owner</span><span class="pill-val text-muted">${stats.dispatcher}</span></div><div class="pill-stat"><span class="pill-label">Sites</span><span class="pill-val">${stats.uniqueVids.size}</span></div><div class="pill-stat"><span class="pill-label">Pay</span><span class="pill-val text-primary">$${stats.totalPay.toLocaleString()}</span></div><div class="pill-stat"><span class="pill-label">Avg</span><span class="pill-val fw-800">$${overallAvg.toLocaleString()}</span></div></div><div class="contractor-details" id="drill-${idx}"><table class="detail-data-table shadow-sm"><thead><tr><th>Work Order #</th><th>Unique VIDs</th><th>Sum of Rate</th><th>Avg / Stop</th></tr></thead><tbody>${Object.entries(stats.jobs).map(([wo, job]) => `<tr><td>${wo}</td><td>${job.vids.size}</td><td>$${job.rate.toLocaleString()}</td><td class="fw-800">$${Math.round(job.rate / (job.vids.size || 1)).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>`;
+        });
+        $("#contractorList").html(pillHtml);
 
-        function initMap() {
-            if (typeof google === 'undefined') return;
-            map = new google.maps.Map(document.getElementById('map'), { 
-                zoom: 4, center: { lat: 39.8, lng: -98.5 },
-                styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }]
-            });
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
-
-            drawingManager = new google.maps.drawing.DrawingManager({
-                drawingMode: null,
-                drawingControl: true,
-                drawingControlOptions: {
-                    position: google.maps.ControlPosition.TOP_CENTER,
-                    drawingModes: [google.maps.drawing.OverlayType.POLYGON]
-                },
-                polygonOptions: { fillColor: '#3b82f6', fillOpacity: 0.2, strokeWeight: 2, clickable: false, zIndex: 1 }
-            });
-            drawingManager.setMap(map);
-
-            google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
-                processPolygonSelection(polygon);
-                drawingManager.setDrawingMode(null);
-            });
+        if (dates.length > 0) {
+            dates.sort((a,b) => a - b);
+            const min = dates[0], max = dates[dates.length - 1];
+            document.getElementById('datePill').style.display = 'block';
+            document.getElementById('periodValueText').innerText = `${min.toLocaleDateString()} - ${max.toLocaleDateString()}`;
         }
-
-        // NEW: Smart Search Function for Contractor Emails
-        function filterEmails(query) {
-            const datalist = document.getElementById('ic_email_list');
-            datalist.innerHTML = ''; // Clear the dropdown
-            
-            if (query.length < 2) return; // Don't show options until 2 characters are typed
-            
-            // Find matches and limit to 5 results
-            const matches = allContractorEmails.filter(email => email.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
-            
-            matches.forEach(email => {
-                const opt = document.createElement('option');
-                opt.value = email;
-                datalist.appendChild(opt);
-            });
-        }
-
-        function filterMapByPod() {
-            const selectedPod = document.getElementById('podFilter').value;
-            allOnfleetMarkers.forEach(marker => {
-                const task = marker.taskData;
-                const stateStr = task.state ? task.state.toUpperCase().trim() : "";
-                
-                let matchedPod = "Unknown";
-                
-                if (podData[stateStr]) {
-                    matchedPod = podData[stateStr];
-                } else {
-                    for (const [stateAbbr, podColor] of Object.entries(podData)) {
-                        if (task.addr.toUpperCase().endsWith(` ${stateAbbr}`) || task.addr.toUpperCase().includes(`, ${stateAbbr} `) || task.addr.toUpperCase().includes(` ${stateAbbr} `)) {
-                            matchedPod = podColor;
-                            break;
-                        }
-                    }
-                }
-                
-                task.pod = matchedPod; 
-
-                if (selectedPod === "All" || matchedPod === selectedPod) {
-                    marker.setVisible(true);
-                } else {
-                    marker.setVisible(false);
-                }
-            });
-        }
-
-        function setDefaultDate() {
-            const today = new Date();
-            today.setDate(today.getDate() + 14);
-            document.getElementById('due_date').value = today.toISOString().split('T')[0];
-        }
-
-        async function lookupContractor(email) {
-            if (!email || !webAppUrl.includes("https")) return;
-            try {
-                const response = await fetch(`${webAppUrl}?email=${encodeURIComponent(email)}`);
-                const data = await response.json();
-                if (data && !data.error) {
-                    document.getElementById('ic_name_setup').value = data.name;
-                    document.getElementById('ic_address').value = data.address;
-                    if (data.rate) currentGlobalRate = data.rate;
-                    
-                    window.currentContractorPhone = data.phone || ""; 
-
-                    calculateLargeRoute();
-                    document.getElementById('saveBtn').disabled = true;
-                    document.getElementById('saveBtn').classList.add('opacity-30', 'grayscale');
-                }
-            } catch (e) { console.error("Lookup failed", e); }
-        }
-
-        async function saveToDatabase() {
-            const p = { email: document.getElementById('ic_email_setup').value, name: document.getElementById('ic_name_setup').value, address: document.getElementById('ic_address').value };
-            try { 
-                await fetch(webAppUrl, { 
-                    method: 'POST', 
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify(p) 
-                }); 
-                alert("Database Updated"); 
-                document.getElementById('saveBtn').disabled = true; 
-            } catch (e) { alert("Save failed"); }
-        }
-
-        function handleManualEdit() {
-            const btn = document.getElementById('saveBtn');
-            btn.disabled = false;
-            btn.classList.remove('opacity-30', 'grayscale', 'cursor-not-allowed');
-            btn.classList.add('opacity-100');
-        }
-
-        async function fetchOnfleetTasks(isGlobal) {
-            const homeAddress = document.getElementById('ic_address').value;
-            if (!isGlobal && !homeAddress) return alert("Please lookup a contractor or enter a home address first.");
-            
-            const loader = document.getElementById('loaderOverlay');
-            loader.classList.remove('hidden'); loader.classList.add('flex');
-            
-            let url = `${webAppUrl}?action=getOnfleetTasks`;
-            if (homeAddress) url += `&homeAddress=${encodeURIComponent(homeAddress)}`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.error) throw new Error(data.error);
-                const tasks = Array.isArray(data) ? data : (data.tasks || []); 
-                if (data.rate) currentGlobalRate = data.rate;
-
-                allOnfleetMarkers.forEach(m => m.setMap(null));
-                allOnfleetMarkers = [];
-                const selectedAddresses = {};
-
-                let homeLoc = null;
-                if (data.homeLoc) homeLoc = new google.maps.LatLng(data.homeLoc.lat, data.homeLoc.lng);
-
-                let localBounds = new google.maps.LatLngBounds();
-                if (homeLoc) localBounds.extend(homeLoc);
-
-                tasks.forEach(task => {
-                    const taskLatLng = new google.maps.LatLng(task.lat, task.lng);
-                    const marker = new google.maps.Marker({
-                        position: taskLatLng,
-                        map: map,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 7,
-                            fillColor: task.isKiosk ? "#10b981" : "#ef4444",
-                            fillOpacity: 0.9,
-                            strokeWeight: 2,
-                            strokeColor: "#ffffff"
-                        }
-                    });
-                    marker.taskData = task;
-                    allOnfleetMarkers.push(marker);
-                });
-
-                filterMapByPod();
-
-                allOnfleetMarkers.forEach(marker => {
-                    if (!isGlobal && homeLoc && marker.getVisible()) {
-                        const task = marker.taskData;
-                        const distanceMeters = google.maps.geometry.spherical.computeDistanceBetween(homeLoc, marker.getPosition());
-                        if ((distanceMeters * 0.000621371) <= 40) {
-                            if (!selectedAddresses[task.addr]) selectedAddresses[task.addr] = { count: 0, kioskCount: 0 };
-                            selectedAddresses[task.addr].count++;
-                            if (task.isKiosk) selectedAddresses[task.addr].kioskCount++;
-                            localBounds.extend(marker.getPosition());
-                        }
-                    }
-                });
-
-                if (!isGlobal && homeLoc) {
-                    const formatted = Object.keys(selectedAddresses).map(addr => {
-                        const d = selectedAddresses[addr];
-                        let entry = addr;
-                        if (d.kioskCount > 0) entry += ` [${d.kioskCount} Kiosk Install]`;
-                        if (d.count > d.kioskCount) entry += ` (${d.count - d.kioskCount} Tasks)`;
-                        return entry;
-                    }).join('\n');
-                    
-                    document.getElementById('locations').value = formatted;
-                    
-                    map.fitBounds(localBounds);
-                    const listener = google.maps.event.addListener(map, "idle", function() { 
-                        if (map.getZoom() > 10) map.setZoom(10); 
-                        google.maps.event.removeListener(listener); 
-                    });
-
-                    calculateLargeRoute();
-
-                    if(formatted.length === 0) {
-                        alert("All tasks loaded, but none found within 40 miles of home address for the selected Pod.");
-                    } else {
-                        alert(`Auto-selected locations within 40 miles.`);
-                    }
-                } else {
-                    map.setCenter({ lat: 39.8, lng: -98.5 });
-                    map.setZoom(4);
-                    alert(`Loaded ${tasks.length} unassigned tasks. Map filtered by your selection.`);
-                }
-            } catch (e) { alert("Sync Error: " + e.message); }
-            finally { loader.classList.add('hidden'); }
-        }
-
-        function processPolygonSelection(polygon) {
-            const selectedAddresses = {};
-            allOnfleetMarkers.forEach(marker => {
-                if (marker.getVisible() && google.maps.geometry.poly.containsLocation(marker.getPosition(), polygon)) {
-                    const t = marker.taskData;
-                    if (!selectedAddresses[t.addr]) selectedAddresses[t.addr] = { count: 0, kioskCount: 0 };
-                    selectedAddresses[t.addr].count++;
-                    if (t.isKiosk) selectedAddresses[t.addr].kioskCount++;
-                }
-            });
-
-            const formatted = Object.keys(selectedAddresses).map(addr => {
-                const d = selectedAddresses[addr];
-                let entry = addr;
-                if (d.kioskCount > 0) entry += ` [${d.kioskCount} Kiosk Install]`;
-                if (d.count > d.kioskCount) entry += ` (${d.count - d.kioskCount} Tasks)`;
-                return entry;
-            }).join('\n');
-
-            const area = document.getElementById('locations');
-            area.value = (area.value ? area.value + "\n" : "") + formatted;
-            calculateLargeRoute();
-            polygon.setMap(null);
-        }
-
-        function updateBadges(locCount, taskCount, kioskCount) {
-            currentLocCount = locCount; currentTaskCount = taskCount; currentKioskCount = kioskCount;
-            const lBadge = document.getElementById('location_count_badge'), kBadge = document.getElementById('kiosk_count_badge');
-            if (locCount > 0) {
-                lBadge.innerText = `${locCount} Locations | ${taskCount} Total Tasks`;
-                lBadge.classList.remove('hidden');
-            } else lBadge.classList.add('hidden');
-            if (kioskCount > 0) {
-                kBadge.innerText = `${kioskCount} Kiosk Installs`;
-                kBadge.classList.remove('hidden');
-            } else kBadge.classList.add('hidden');
-        }
-
-        function calculateLargeRoute() {
-            clearTimeout(inputTimer);
-            const mileageDisplay = document.getElementById('mileage_display'), timeDisplay = document.getElementById('time_display'), compInput = document.getElementById('comp');
-            const home = document.getElementById('ic_address').value.trim(), textArea = document.getElementById('locations');
-            const lines = textArea.value.split('\n').filter(l => l.trim().length > 5);
-            
-            if (lines.length > 0) {
-                let totalT = 0, totalK = 0;
-                lines.forEach(line => {
-                    const tMatch = line.match(/\((\d+)\sTasks\)/i);
-                    const kMatch = line.match(/\[(\d+)\sKiosk\sInstall\]/i);
-                    let lineKiosks = kMatch ? parseInt(kMatch[1]) : (line.toLowerCase().includes('kiosk install') ? 1 : 0);
-                    let lineTasks = tMatch ? parseInt(tMatch[1]) : 0;
-                    if (!tMatch && !kMatch && lineKiosks === 0) lineTasks = 1;
-                    totalT += (lineTasks + lineKiosks);
-                    totalK += lineKiosks;
-                });
-                updateBadges(lines.length, totalT, totalK);
-            } else {
-                updateBadges(0, 0, 0);
-            }
-
-            if (lines.length === 0) return;
-
-            inputTimer = setTimeout(() => {
-                if (!home) return;
-                const stops = lines.map(s => s.replace(/\s[\(\[].*$/, "").trim());
-                
-                if (stops.length > 25) {
-                    mileageDisplay.innerText = "Limit";
-                    timeDisplay.innerText = "> 25 Stops";
-                    alert("Route has more than 25 stops. Google Maps cannot generate a continuous drive route for groups this large. Mileage and Time will need to be entered manually.");
-                    return;
-                }
-
-                directionsService.route({
-                    origin: home, destination: home, waypoints: stops.map(l => ({location: l, stopover: true})),
-                    optimizeWaypoints: true, travelMode: google.maps.TravelMode.DRIVING
-                }, (result, status) => {
-                    if (status === 'OK') {
-                        directionsRenderer.setDirections(result);
-                        let totalMeters = 0, totalSeconds = 0;
-                        result.routes[0].legs.forEach(leg => { totalMeters += leg.distance.value; totalSeconds += leg.duration.value; });
-                        mileageDisplay.innerText = (totalMeters * 0.000621371).toFixed(1);
-                        const h = Math.floor(totalSeconds / 3600), m = Math.floor((totalSeconds % 3600) / 60);
-                        timeDisplay.innerText = h > 0 ? h + "h " + m + "m" : m + "m";
-                        compInput.placeholder = `Sug: $${(totalSeconds / 3600 * currentGlobalRate).toFixed(2)}`; 
-                        window.optimizedSequence = [home, ...result.routes[0].waypoint_order.map(i => stops[i]), home];
-                    }
-                });
-            }, 800);
-        }
-
-        async function generateCertifiedLink() {
-            const btn = document.getElementById('generateBtn');
-            btn.disabled = true;
-            btn.innerText = "SAVING ROUTE TO DATABASE...";
-
-            try {
-                let selectedIds = [];
-                const locationLines = document.getElementById('locations').value.split('\n').filter(l => l.trim().length > 5);
-                locationLines.forEach(line => {
-                    const addrOnly = line.replace(/\s[\(\[].*$/, "").trim();
-                    allOnfleetMarkers.forEach(m => {
-                        if (m.taskData.addr === addrOnly) selectedIds.push(m.taskData.id);
-                    });
-                });
-                const uniqueIds = [...new Set(selectedIds)]; 
-
-                const jobListOnly = locationLines.join('|');
-                const d = {
-                    icn: document.getElementById('ic_name_setup').value, 
-                    ice: document.getElementById('ic_email_setup').value,
-                    wo: document.getElementById('task_num').value, 
-                    due: document.getElementById('due_date').value,
-                    comp: document.getElementById('comp').value, 
-                    mi: document.getElementById('mileage_display').innerText,
-                    time: document.getElementById('time_display').innerText, 
-                    locs: window.optimizedSequence ? window.optimizedSequence.join('|') : "",
-                    lCnt: currentLocCount, 
-                    tCnt: currentTaskCount, 
-                    kCnt: currentKioskCount, 
-                    jobOnly: jobListOnly,
-                    phone: window.currentContractorPhone,
-                    taskIds: uniqueIds.join(',') 
-                };
-
-                if (!d.ice || d.mi === "0.0") {
-                    btn.disabled = false; btn.innerText = "Generate Authorization Link";
-                    return alert("Data missing. Please check email and map locations.");
-                }
-
-                const routeId = "R-" + Math.floor(10000 + Math.random() * 90000);
-                const payloadStr = JSON.stringify(d);
-
-                const saveUrl = `${webAppUrl}?action=saveRoute&routeId=${routeId}&icn=${encodeURIComponent(d.icn)}&ice=${encodeURIComponent(d.ice)}&wo=${encodeURIComponent(d.wo)}&payload=${encodeURIComponent(payloadStr)}`;
-                
-                const response = await fetch(saveUrl);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const tinyLink = `${window.location.origin}${window.location.pathname}?route=${routeId}`;
-                    
-                    const s = `Action Required: Terraboost Route Request | WO #${d.wo}`;
-                    let emailDate = d.due ? `${d.due.split('-')[1]}/${d.due.split('-')[2]}/${d.due.split('-')[0]}` : 'N/A';
-                    
-                    const dispatcherEmail = document.getElementById('d_email').value;
-                    
-                    const b = `Dear ${d.icn},\n\nRoute Summary:\n- Due Date: ${emailDate}\n- Locations: ${d.lCnt}\n- Tasks: ${d.tCnt}\n- Kiosk Installs: ${d.kCnt}\n- Mileage: ${d.mi} Miles\n- Compensation: $${d.comp}\n\nReview Link: ${tinyLink}\n\nSent by: ${dispatcherEmail}`;
-                    
-                    window.open(`mailto:${d.ice}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`);
-                    
-                    btn.innerText = "LINK GENERATED SAFELY";
-                    btn.classList.add('bg-emerald-600');
-                    setTimeout(() => { btn.disabled = false; btn.innerText = "Generate Authorization Link"; btn.classList.remove('bg-emerald-600'); }, 3000);
-                } else {
-                    throw new Error("Database rejected save.");
-                }
-                
-            } catch (err) { 
-                alert("Error saving route. Please ensure you deployed a New Version of your Google Script."); 
-                btn.disabled = false; btn.innerText = "Generate Authorization Link";
-            }
-        }
-
-        window.onload = () => {
-            initMap(); setDefaultDate();
-            
-            // NEW: Fetch all contractor emails and store them invisibly in the background
-            fetch(`${webAppUrl}?action=getAllContractors`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.emails) {
-                        allContractorEmails = data.emails; // Holds the emails for the smart search
-                    }
-                }).catch(e => console.log("Silent error loading contractor emails", e));
-            
-            const p = new URLSearchParams(window.location.search);
-            const routeId = p.get('route'); 
-            
-            if (routeId) {
-                document.getElementById('setupFields').remove();
-                document.getElementById('icMode').classList.remove('hidden');
-                
-                document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10"><div class="spinner mx-auto mb-4 border-blue-500"></div><p class="text-slate-500 font-bold animate-pulse">Loading Route Data...</p></div>`;
-                
-                fetch(`${webAppUrl}?action=getRoute&routeId=${routeId}`)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.error) {
-                            document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ ${result.error}</div>`;
-                            return;
-                        }
-                        
-                        const d = result.payload;
-                        window.payloadData = d;
-                        
-                        let displayDate = d.due ? `${d.due.split('-')[1]}/${d.due.split('-')[2]}/${d.due.split('-')[0]}` : 'N/A';
-                        
-                        document.getElementById('summaryZone').innerHTML = `
-                            <div class="flex justify-between border-b pb-2 mb-2 font-bold uppercase text-[10px] tracking-widest text-slate-400"><span>Route Summary</span></div>
-                            <div class="flex justify-between border-b pb-2 mb-2"><span>Contractor:</span> <span class="font-bold">${d.icn}</span></div>
-                            <div class="flex justify-between text-blue-600 font-bold"><span>Work Order #:</span> <span>${d.wo}</span></div>
-                            <div class="flex justify-between"><span>Due Date:</span> <span class="font-bold">${displayDate}</span></div>
-                            <div class="flex justify-between"><span>Unique Locations:</span> <span class="font-bold">${d.lCnt}</span></div>
-                            <div class="flex justify-between"><span>Total Tasks:</span> <span class="font-bold">${d.tCnt}</span></div>
-                            <div class="flex justify-between text-emerald-600 font-bold"><span>Kiosk Installs:</span> <span>${d.kCnt}</span></div>
-                            <div class="flex justify-between"><span>Mileage:</span> <span>${d.mi} Miles</span></div>
-                            <div class="flex justify-between border-t pt-2 mt-2 font-black text-xl text-emerald-600"><span>Total Comp:</span> <span>$${d.comp}</span></div>
-                        `;
-                    })
-                    .catch(e => {
-                        document.getElementById('summaryZone').innerHTML = `<div class="text-center py-10 text-red-500 font-bold">⚠️ Error connecting to database. Please refresh.</div>`;
-                    });
-            }
-        };
-
-        function buildMapsUrl(limit) {
-            if (!window.payloadData || !window.payloadData.locs) return null;
-            const stops = window.payloadData.locs.split('|').slice(0, limit);
-            const origin = encodeURIComponent(stops[0]);
-            const dest = encodeURIComponent(stops[stops.length-1]);
-            const waypoints = stops.slice(1, -1).map(w => encodeURIComponent(w)).join('/');
-            return `https://www.google.com/maps/dir/${origin}/${waypoints}/${dest}/`;
-        }
-        function viewRoute(limit) { const url = buildMapsUrl(limit); if (url) window.open(url, '_blank'); }
-        function copyMapUrl() { const url = buildMapsUrl(25); if (url) { navigator.clipboard.writeText(url); alert("Link Copied"); } }
-        
-        function confirmClearList() {
-            if (confirm("Clear all locations?")) {
-                document.getElementById('locations').value = '';
-                updateBadges(0, 0, 0);
-                document.getElementById('mileage_display').innerText = "0.0";
-                document.getElementById('time_display').innerText = "--";
-                document.getElementById('comp').placeholder = "0.00";
-                if (directionsRenderer) directionsRenderer.setDirections({routes: []});
-            }
-        }
-
-        function clearFullForm() {
-            document.getElementById('dispatchForm').reset();
-            setDefaultDate();
-            document.getElementById('locations').value = "";
-            document.getElementById('mileage_display').innerText = "0.0";
-            document.getElementById('time_display').innerText = "--";
-            document.getElementById('comp').placeholder = "0.00";
-            updateBadges(0, 0, 0);
-            if (directionsRenderer) directionsRenderer.setDirections({routes: []});
-        }
-
-        function toggleDecisionView() {
-            const decision = document.querySelector('input[name="ic_decision"]:checked').value;
-            const reasonBlock = document.getElementById('reason_block');
-            const signatureBlock = document.getElementById('signature_block');
-            if (decision === 'Declined') {
-                reasonBlock.classList.remove('hidden');
-                signatureBlock.classList.add('hidden');
-            } else {
-                reasonBlock.classList.add('hidden');
-                signatureBlock.classList.remove('hidden');
-            }
-        }
-
-        function updateLiveSignature(val) { document.getElementById('live_sig_text').innerText = val || "________________"; }
-
-        async function submitToFormspree() {
-            const decision = document.querySelector('input[name="ic_decision"]:checked').value;
-            const sig = document.getElementById('typed_sig').value;
-            const consent = document.getElementById('legal_consent').checked;
-            const counter = document.getElementById('ic_counter_val').value;
-            const notes = document.getElementById('ic_notes').value;
-
-            if (decision === 'Accepted' && (!sig || !consent)) {
-                return alert("Signature and consent required to accept.");
-            }
-
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "Sending...";
-
-            const rawJobContent = window.payloadData.jobOnly ? window.payloadData.jobOnly.split('|') : [];
-            const locationList = rawJobContent.map((loc, index) => `${index + 1}. ${loc}`).join('\n');
-            
-            let emailDate = 'N/A';
-            if (window.payloadData.due) {
-                const parts = window.payloadData.due.split('-');
-                emailDate = parts.length === 3 ? `${parts[1]}/${parts[2]}/${parts[0]}` : window.payloadData.due;
-            }
-
-            const formData = {
-                "Decision": decision,
-                "Contractor": window.payloadData.icn,
-                "Work Order": window.payloadData.wo,
-                "Due Date": emailDate,
-                "Locations": window.payloadData.lCnt,
-                "Tasks": window.payloadData.tCnt,
-                "Kiosks": window.payloadData.kCnt,
-                "Mileage": window.payloadData.mi,
-                "Original Comp": `$${window.payloadData.comp}`,
-                "Counter Offer": counter ? `$${counter}` : "N/A",
-                "Notes": notes || "None",
-                "Signature": sig || "N/A",
-                "TASK LOCATION LIST": "\n" + locationList,
-                "_subject": `${decision}: WO #${window.payloadData.wo} (${window.payloadData.icn})`
-            };
-
-            try {
-                const response = await fetch(formspreeUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (response.ok) {
-                    document.getElementById('icMode').classList.add('hidden');
-                    document.getElementById('successView').classList.remove('hidden');
-
-                    if (decision === 'Accepted' && window.payloadData.phone && window.payloadData.taskIds) {
-                        const assignUrl = `${webAppUrl}?action=assignTasks&phone=${encodeURIComponent(window.payloadData.phone)}&taskIds=${encodeURIComponent(window.payloadData.taskIds)}`;
-                        fetch(assignUrl)
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    alert(`Success! ${data.msg}`);
-                                } else {
-                                    alert(`Auto-Assign Failed: ${data.error}`);
-                                }
-                            })
-                            .catch(e => alert("Auto-assign network request failed."));
-                    }
-
-                } else {
-                    throw new Error();
-                }
-            } catch (e) {
-                alert("Submission failed. Please try again.");
-                btn.disabled = false; btn.innerText = "Submit Response";
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
