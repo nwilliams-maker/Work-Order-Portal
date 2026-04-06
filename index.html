@@ -45,7 +45,7 @@
         .history-section::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
         .history-section::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
 
-        .history-title { font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+        .history-title { font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; }
         .month-group { margin-bottom: 0.5rem; }
         .month-header { 
             font-size: 0.7rem; font-weight: 800; color: white; text-transform: uppercase; 
@@ -89,19 +89,53 @@
         .btn-batch:hover { background: #334155; }
         .btn-save { background: var(--success); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 700; color: white; cursor: pointer; width: 100%; margin-top: 10px; display: none; font-size: 0.75rem; }
         
-        .selection-panel { display: flex; gap: 8px; margin-top: 10px; display: none; }
-        .btn-merge { background: var(--warning); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; color: #1e293b; cursor: pointer; flex: 1; font-size: 0.75rem; transition: all 0.2s; }
+        .selection-panel { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; display: none; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .selection-row { display: flex; gap: 8px; }
+        .btn-merge { background: var(--accent); border: none; border-radius: 8px; padding: 8px; font-weight: 800; color: white; cursor: pointer; flex: 1; font-size: 0.75rem; transition: all 0.2s; }
         .btn-merge:hover { opacity: 0.8; }
-        .btn-danger-custom { background: var(--danger); border: none; border-radius: 10px; padding: 8px 12px; font-weight: 800; color: white; cursor: pointer; flex: 1; font-size: 0.75rem; transition: all 0.2s; }
-        .btn-danger-custom:hover { opacity: 0.8; }
+        .btn-danger-custom { background: rgba(225, 29, 72, 0.2); border: 1px solid var(--danger); border-radius: 8px; padding: 8px; font-weight: 800; color: #fecdd3; cursor: pointer; flex: 1; font-size: 0.75rem; transition: all 0.2s; }
+        .btn-danger-custom:hover { background: var(--danger); color: white; }
+        .btn-clear-selection { background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px; font-weight: 700; color: #cbd5e1; cursor: pointer; font-size: 0.7rem; transition: all 0.2s; text-align: center; }
+        .btn-clear-selection:hover { background: rgba(255,255,255,0.1); color: white; }
 
         .sync-panel { display: flex; gap: 8px; margin-top: 10px; }
         .btn-sync { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px; color: #cbd5e1; flex: 1; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
         .btn-sync:hover { background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3); }
 
-        .unified-card { background: white; border-radius: 24px; padding: 2.5rem; border: 1px solid var(--card-border); }
+        .unified-card { background: white; border-radius: 24px; padding: 2.5rem; border: 1px solid var(--card-border); margin-bottom: 1.5rem;}
         .table-subtotal { background-color: rgba(37, 99, 235, 0.04); font-weight: 800; }
         .table-grandtotal { background-color: rgba(37, 99, 235, 0.08); font-weight: 800; border-top: 2px solid var(--accent); }
+        
+        .exception-venue-list { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; padding-left: 10px; border-left: 2px solid #e2e8f0; }
+        .exception-venue-item { display: flex; justify-content: space-between; margin-bottom: 2px; }
+        
+        .venue-pill-container { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .venue-pill-container::-webkit-scrollbar { height: 4px; }
+        .venue-pill-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .venue-pill-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .venue-pill { background: white; border: 1px solid var(--card-border); border-radius: 20px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 2px 4px -1px rgba(0,0,0,0.02); }
+        .venue-pill-name { font-weight: 700; color: var(--text-main); font-size: 0.85rem; }
+        .venue-pill-count { background: #f1f5f9; color: var(--accent); font-weight: 800; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; }
+        
+        /* Modern Filters */
+        .advanced-filter-container { background: white; border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); overflow: hidden; }
+        .filter-controls { display: flex; gap: 12px; padding: 1.25rem 1.5rem; align-items: center; flex-wrap: wrap; background: #f8fafc; border-bottom: 1px solid var(--card-border); }
+        .search-box { flex: 1; min-width: 250px; position: relative; }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1rem; }
+        .search-box input { width: 100%; padding: 10px 12px 10px 36px; border: 1px solid #cbd5e1; border-radius: 10px; font-family: inherit; font-size: 0.9rem; outline: none; transition: all 0.2s; }
+        .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        
+        .modern-select { padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: 10px; font-family: inherit; font-size: 0.9rem; outline: none; background: white; color: var(--text-main); cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .modern-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        
+        .active-filters-area { padding: 1rem 1.5rem; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: white; }
+        .filter-chip { background: #eff6ff; color: var(--accent); border: 1px solid #bfdbfe; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .filter-chip-danger { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
+        .chip-close { cursor: pointer; font-weight: 800; font-size: 1rem; line-height: 1; transition: opacity 0.2s; }
+        .chip-close:hover { opacity: 0.6; }
+        
+        .clear-all-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; cursor: pointer; padding: 4px 8px; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.2s; }
+        .clear-all-btn:hover { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -115,8 +149,12 @@
     <button id="saveBtn" class="btn-save" onclick="persistCurrentReport()">💾 Save to Archive</button>
     
     <div id="selectionPanel" class="selection-panel">
-        <button id="mergeBtn" class="btn-merge m-0" onclick="mergeSelectedReports()">🔗 Merge</button>
-        <button id="deleteBatchBtn" class="btn-danger-custom m-0" onclick="deleteSelectedReports()">🗑️ Delete</button>
+        <div class="text-center text-white small fw-bold mb-1" id="selectionCount">0 Selected</div>
+        <div class="selection-row">
+            <button id="mergeBtn" class="btn-merge" onclick="mergeSelectedReports()">🔗 Merge</button>
+            <button id="deleteBatchBtn" class="btn-danger-custom" onclick="deleteSelectedReports()">🗑️ Delete</button>
+        </div>
+        <button class="btn-clear-selection mt-1" onclick="clearBulkSelection()">Clear Selection</button>
     </div>
     
     <div class="sync-panel">
@@ -125,7 +163,10 @@
     </div>
     
     <div class="history-section">
-        <div class="history-title mt-2">Archived Reports</div>
+        <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+            <div class="history-title m-0">Archived Reports</div>
+            <button class="btn-clear-selection py-1 px-2 m-0" onclick="selectAllReports()">Select All</button>
+        </div>
         <div id="historyBadges"></div>
     </div>
 </div>
@@ -241,6 +282,13 @@
             </div>
         </div>
         
+        <div class="mb-4">
+            <h6 class="fw-800 mb-3 text-muted small text-uppercase">Venue Volume</h6>
+            <div class="venue-pill-container" id="topVenuesContainer">
+                <div class="text-muted small">Load a report to see venues</div>
+            </div>
+        </div>
+
         <div class="unified-card">
             <div class="row g-5">
                 <div class="col-lg-8 border-end">
@@ -258,8 +306,37 @@
     </div>
 
     <div id="view-details" style="display:none;">
-        <div id="contractorList">
-            <div class="text-center text-muted py-5">Upload a CSV to view contractor breakdowns.</div>
+        
+        <div class="advanced-filter-container">
+            <div class="filter-controls">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="modernSearch" placeholder="Search contractors or WO#..." onkeyup="applyFiltersAndSort()">
+                </div>
+                <select id="modernInclude" class="modern-select" onchange="applyFiltersAndSort()">
+                    <option value="all">✅ Any Dispatcher</option>
+                </select>
+                <select id="modernExclude" class="modern-select" onchange="applyFiltersAndSort()">
+                    <option value="none">🚫 Exclude Dispatcher...</option>
+                </select>
+                <select id="modernSort" class="modern-select" onchange="applyFiltersAndSort()">
+                    <option value="pay-desc">💰 Sort: Highest Pay</option>
+                    <option value="sites-desc">🏢 Sort: Most Sites</option>
+                    <option value="avg-desc">📈 Sort: Highest Avg</option>
+                    <option value="name-asc">🔤 Sort: Name (A-Z)</option>
+                </select>
+            </div>
+            <div class="active-filters-area" id="activeFiltersArea" style="display:none;">
+                <span class="text-muted small fw-800 me-2" style="letter-spacing: 0.05em;">ACTIVE FILTERS:</span>
+                <div id="filterChipsContainer" class="d-flex gap-2 flex-wrap"></div>
+                <button class="clear-all-btn ms-auto" onclick="clearAllFilters()">Clear All</button>
+            </div>
+        </div>
+
+        <div id="contractorListWrapper">
+            <div id="contractorListEmpty" class="text-center text-muted py-5">Upload a CSV to view contractor breakdowns.</div>
+            <div id="contractorListInner"></div>
+            <div id="contractorListNoResults" class="text-center text-muted py-5" style="display:none;">No contractors match your filters.</div>
         </div>
     </div>
 </div>
@@ -267,7 +344,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
@@ -281,7 +357,7 @@
 
     let currentData = null;
     let currentLabel = "";
-    window.pdfExportData = null; // Global object to hold raw data for native PDF writer
+    window.pdfExportData = null; 
     
     function getArchiveData() {
         try {
@@ -322,21 +398,21 @@
         
         const data = window.pdfExportData;
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'pt', 'letter'); // standard 8.5 x 11 portrait
+        const doc = new jsPDF('p', 'pt', 'letter'); 
         const sanitizedLabel = currentLabel ? currentLabel.replace(/[^a-zA-Z0-9-]/g, '_') : 'Report';
         
         // Header
         doc.setFontSize(22);
-        doc.setTextColor(15, 23, 42); // slate-900
+        doc.setTextColor(15, 23, 42); 
         doc.setFont("helvetica", "bold");
         doc.text("OpsCenter Financial Overview", 40, 50);
         
         doc.setFontSize(12);
-        doc.setTextColor(100, 116, 139); // slate-500
+        doc.setTextColor(100, 116, 139); 
         doc.setFont("helvetica", "normal");
         doc.text(currentLabel, 40, 70);
 
-        // KPI Summary Table 1: Financials
+        // KPI Summary Table 1
         doc.autoTable({
             startY: 90,
             head: [['Total Combined Cost', 'Fixed CTE Total', 'IC Job Pay']],
@@ -352,18 +428,18 @@
                 if (info.section === 'body' && info.row.index === 0) {
                     info.cell.styles.fontSize = 20;
                     info.cell.styles.fontStyle = 'bold';
-                    if(info.column.index === 0) info.cell.styles.textColor = [37, 99, 235]; // Blue for Combined
+                    if(info.column.index === 0) info.cell.styles.textColor = [37, 99, 235]; 
                     else info.cell.styles.textColor = [30, 41, 59];
                 }
                 if (info.section === 'body' && info.row.index === 1) {
                     info.cell.styles.fontSize = 10;
                     info.cell.styles.textColor = [100, 116, 139];
-                    if(info.column.index === 0 || info.column.index === 2) info.cell.styles.textColor = [16, 185, 129]; // Green for avg
+                    if(info.column.index === 0 || info.column.index === 2) info.cell.styles.textColor = [16, 185, 129]; 
                 }
             }
         });
         
-        // KPI Summary Table 2: Operations
+        // KPI Summary Table 2
         doc.autoTable({
             startY: doc.lastAutoTable.finalY + 15,
             head: [['Unique Sites', 'Escalations', 'Exceptions']],
@@ -380,8 +456,8 @@
                     info.cell.styles.fontSize = 20;
                     info.cell.styles.fontStyle = 'bold';
                     info.cell.styles.textColor = [30, 41, 59];
-                    if (info.column.index === 1) info.cell.styles.textColor = [180, 83, 9]; // Orange warning
-                    if (info.column.index === 2) info.cell.styles.textColor = [225, 29, 72]; // Red danger
+                    if (info.column.index === 1) info.cell.styles.textColor = [180, 83, 9]; 
+                    if (info.column.index === 2) info.cell.styles.textColor = [225, 29, 72]; 
                 }
                 if (info.section === 'body' && info.row.index === 1) {
                     info.cell.styles.fontSize = 10;
@@ -413,10 +489,10 @@
             ]);
         }
 
-        // Generate Dispatcher Table (Left side)
+        // Generate Dispatcher Table
         doc.autoTable({
             startY: contentStartY,
-            margin: { left: 40, right: 230 }, // Leaves right side blank for exceptions
+            margin: { left: 40, right: 300 }, 
             head: [['Dispatcher', 'Sites', 'Total Pay', 'Avg / Site']],
             body: dispatcherBody,
             theme: 'grid',
@@ -430,21 +506,47 @@
             }
         });
 
-        // Generate Exceptions Table (Right side)
+        // Exception Table with Venues
+        let exceptionBody = [];
+        data.exceptionBreakdown.forEach(ex => {
+            exceptionBody.push([{ content: ex.reason, fontStyle: 'bold', textColor: [225, 29, 72] }, { content: ex.total, halign: 'center', fontStyle: 'bold', textColor: [225, 29, 72] }]);
+            if(ex.venues.length > 0) {
+                let venueString = ex.venues.map(v => `${v.venue} (${v.count})`).join(', ');
+                exceptionBody.push([{ content: venueString, colSpan: 2, styles: { fontSize: 8, textColor: [100, 116, 139], fontStyle: 'italic', fillColor: [250, 250, 250] } }]);
+            }
+        });
+
         doc.autoTable({
             startY: contentStartY,
-            margin: { left: 410, right: 40 }, // Positions it on the right side
+            margin: { left: 340, right: 40 }, 
             head: [['Exception Reason', 'Count']],
-            body: data.exceptionBreakdown,
+            body: exceptionBody,
             theme: 'grid',
             styles: { font: 'helvetica', fontSize: 9 },
             headStyles: { fillColor: [225, 29, 72], textColor: 255, fontStyle: 'bold' },
             columnStyles: {
-                1: { halign: 'center', fontStyle: 'bold', textColor: [225, 29, 72] }
+                1: { halign: 'center' }
             }
         });
 
-        // Instant Download
+        // Venue Volume Table (Right below Exceptions)
+        let exceptionsFinalY = doc.lastAutoTable.finalY;
+        
+        if (data.topVenues && data.topVenues.length > 0) {
+            doc.autoTable({
+                startY: exceptionsFinalY + 20,
+                margin: { left: 340, right: 40 }, 
+                head: [['Venue Volume', 'Visits']],
+                body: data.topVenues.map(v => [v.venue, v.count.toString()]),
+                theme: 'grid',
+                styles: { font: 'helvetica', fontSize: 9 },
+                headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' }, 
+                columnStyles: {
+                    1: { halign: 'center', fontStyle: 'bold', textColor: [37, 99, 235] }
+                }
+            });
+        }
+
         doc.save(`OpsCenter_Overview_${sanitizedLabel}.pdf`);
     }
 
@@ -622,17 +724,27 @@
 
     function checkSelectionState() {
         const checkedCount = $('.merge-checkbox:checked').length;
-        if (checkedCount >= 2) {
+        if (checkedCount > 0) {
             $('#selectionPanel').fadeIn(200);
-            $('#mergeBtn').show();
-            $('#deleteBatchBtn').show();
-        } else if (checkedCount === 1) {
-            $('#selectionPanel').fadeIn(200);
-            $('#mergeBtn').hide();
-            $('#deleteBatchBtn').show();
+            $('#selectionCount').text(`${checkedCount} Selected`);
+            if (checkedCount >= 2) {
+                $('#mergeBtn').show();
+            } else {
+                $('#mergeBtn').hide();
+            }
         } else {
             $('#selectionPanel').fadeOut(200);
         }
+    }
+
+    function selectAllReports() {
+        $('.merge-checkbox').prop('checked', true);
+        checkSelectionState();
+    }
+    
+    function clearBulkSelection() {
+        $('.merge-checkbox').prop('checked', false);
+        checkSelectionState();
     }
 
     function mergeSelectedReports() {
@@ -649,8 +761,7 @@
             currentData = merged;
             currentLabel = generateDateLabel(merged);
             
-            $('.merge-checkbox').prop('checked', false);
-            $('#selectionPanel').hide();
+            clearBulkSelection();
             
             processData(currentData);
             $('#saveBtn').fadeIn(); 
@@ -685,6 +796,7 @@
             }
             
             loadFromStorage();
+            clearBulkSelection();
         }
     }
 
@@ -791,6 +903,102 @@
 
     function toggleDrill(id) { $(`#drill-${id}`).slideToggle(200); }
 
+    // ==========================================
+    // MODERN SMART FILTER & SORT ENGINE
+    // ==========================================
+    function applyFiltersAndSort() {
+        let searchInput = document.getElementById('modernSearch').value.trim().toLowerCase();
+        let includeSel = document.getElementById('modernInclude');
+        let excludeSel = document.getElementById('modernExclude');
+        let sortSel = document.getElementById('modernSort');
+        
+        let incVal = includeSel.value;
+        let excVal = excludeSel.value;
+        let sortVal = sortSel.value;
+        
+        // 1. Build Visual Chips
+        let chipsHtml = "";
+        let hasFilters = false;
+        
+        if (searchInput !== "") {
+            chipsHtml += `<div class="filter-chip">Search: "${searchInput}" <span class="chip-close" onclick="clearFilter('search')">×</span></div>`;
+            hasFilters = true;
+        }
+        if (incVal !== "all") {
+            chipsHtml += `<div class="filter-chip">Only: ${incVal} <span class="chip-close" onclick="clearFilter('include')">×</span></div>`;
+            hasFilters = true;
+        }
+        if (excVal !== "none") {
+            chipsHtml += `<div class="filter-chip filter-chip-danger">Exclude: ${excVal} <span class="chip-close" onclick="clearFilter('exclude')">×</span></div>`;
+            hasFilters = true;
+        }
+        
+        let activeArea = document.getElementById('activeFiltersArea');
+        if (hasFilters) {
+            document.getElementById('filterChipsContainer').innerHTML = chipsHtml;
+            activeArea.style.display = "flex";
+        } else {
+            activeArea.style.display = "none";
+        }
+
+        // 2. Process Elements
+        let container = document.getElementById('contractorListInner');
+        let items = Array.from(document.getElementsByClassName('contractor-item-wrapper'));
+        
+        // 3. Sort Elements
+        items.sort((a, b) => {
+            if (sortVal === 'pay-desc') return parseFloat(b.dataset.pay) - parseFloat(a.dataset.pay);
+            if (sortVal === 'sites-desc') return parseInt(b.dataset.sites) - parseInt(a.dataset.sites);
+            if (sortVal === 'avg-desc') return parseFloat(b.dataset.avg) - parseFloat(a.dataset.avg);
+            if (sortVal === 'name-asc') return a.dataset.name.localeCompare(b.dataset.name);
+            return 0;
+        });
+
+        // 4. Filter & Re-append
+        let visibleCount = 0;
+        items.forEach(item => {
+            let name = item.dataset.name;
+            let wos = item.dataset.wos || "";
+            let disp = item.dataset.dispatcher;
+            
+            // Search evaluates to TRUE if it matches the contractor name OR any of their Work Order numbers
+            let mSearch = (searchInput === "") || name.includes(searchInput) || wos.includes(searchInput);
+            let mInc = (incVal === 'all') || (disp === incVal);
+            let mExc = (excVal === 'none') || (disp !== excVal);
+            
+            if (mSearch && mInc && mExc) {
+                item.style.display = "";
+                visibleCount++;
+            } else {
+                item.style.display = "none";
+            }
+            container.appendChild(item); 
+        });
+        
+        // 5. Handle Empty States
+        let noResultsMsg = document.getElementById('contractorListNoResults');
+        if(visibleCount === 0 && items.length > 0) {
+            noResultsMsg.style.display = "block";
+        } else {
+            noResultsMsg.style.display = "none";
+        }
+    }
+
+    function clearFilter(type) {
+        if (type === 'search') document.getElementById('modernSearch').value = "";
+        if (type === 'include') document.getElementById('modernInclude').value = "all";
+        if (type === 'exclude') document.getElementById('modernExclude').value = "none";
+        applyFiltersAndSort();
+    }
+
+    function clearAllFilters() {
+        document.getElementById('modernSearch').value = "";
+        document.getElementById('modernInclude').value = "all";
+        document.getElementById('modernExclude').value = "none";
+        document.getElementById('modernSort').value = "pay-desc";
+        applyFiltersAndSort();
+    }
+
     function getDispatcherName(str) {
         if (!str || str.trim() === "") return 'Unassigned';
         let clean = str.replace(/ Total/g, '').trim();
@@ -811,8 +1019,18 @@
         let icJobPay = 0, escCount = 0;
         const ownerMap = { regular: {}, escalations: {} }; 
         const globalLocs = new Set(), icLocs = new Set(), faLocs = new Set(), dates = [];
-        const exMap = { "Venue Closed": 0, "Kiosk Missing": 0, "Refusal": 0, "Damaged": 0 };
+        
+        const exMap = { 
+            "Venue Closed": {}, 
+            "Kiosk Missing": {}, 
+            "Refusal": {}, 
+            "Damaged": {} 
+        };
+        
         const contractorMap = {};
+        const venueVolumeMap = {}; 
+
+        const allDispatchersFound = new Set();
 
         data.forEach(row => {
             if (row['Owner'] === 'Grand Total') return;
@@ -820,7 +1038,8 @@
             const ownerRaw = row['Owner'] || "";
             const dispatcher = getDispatcherName(ownerRaw);
             const assigned = (row['Assigned to'] || row['Technician'] || "").trim();
-            const locKey = (row['street_address'] || row['Address'] || row['Venue Name'] || "").trim().toLowerCase();
+            const locKey = (row['street_address'] || row['Address'] || "").trim().toLowerCase();
+            const pureVenueName = (row['Venue Name'] || "Unknown Venue").trim();
             const wo = row['Work Order Number'] || row['WO #'] || row['Name'] || '--';
             const taskType = (row['task_type'] || row['Task Type'] || "").toLowerCase();
             
@@ -829,6 +1048,8 @@
             
             if (!locKey) return;
             globalLocs.add(locKey);
+            
+            venueVolumeMap[pureVenueName] = (venueVolumeMap[pureVenueName] || 0) + 1;
             
             const d = parseDateSafe(row['Date Visited']);
             if (d) dates.push(d);
@@ -849,6 +1070,7 @@
                 if (!ownerMap[group][dispatcher]) ownerMap[group][dispatcher] = { pay: 0, locs: new Set() };
                 ownerMap[group][dispatcher].pay += rate; 
                 ownerMap[group][dispatcher].locs.add(locKey);
+                allDispatchersFound.add(dispatcher);
 
                 if (assigned !== "" && assigned.toLowerCase() !== "unassigned") {
                     if (!contractorMap[assigned]) { contractorMap[assigned] = { dispatcher: dispatcher, totalPay: 0, uniqueVids: new Set(), jobs: {} }; }
@@ -857,18 +1079,50 @@
                     contractorMap[assigned].jobs[wo].vids.add(locKey); contractorMap[assigned].jobs[wo].rate += rate;
                 }
             }
+            
             if (isEscalationFlag || taskType.includes('escalation')) escCount++;
+            
             const exR = (row['Exception Reason'] || "").toLowerCase();
-            if (exR.includes("closed")) exMap["Venue Closed"]++;
-            else if (exR.includes("missing")) exMap["Kiosk Missing"]++;
-            else if (exR.includes("refusal") || exR.includes("refused")) exMap["Refusal"]++;
-            else if (exR.includes("damaged")) exMap["Damaged"]++;
+            if (exR) {
+                let matchedReason = null;
+                if (exR.includes("closed")) matchedReason = "Venue Closed";
+                else if (exR.includes("missing")) matchedReason = "Kiosk Missing";
+                else if (exR.includes("refusal") || exR.includes("refused")) matchedReason = "Refusal";
+                else if (exR.includes("damaged")) matchedReason = "Damaged";
+
+                if (matchedReason) {
+                    exMap[matchedReason][pureVenueName] = (exMap[matchedReason][pureVenueName] || 0) + 1;
+                }
+            }
         });
 
         const combinedTotal = CTE_TOTAL + icJobPay;
         const totalSites = globalLocs.size || 1;
         
-        // Generate UI Updates
+        const topVenuesArray = Object.entries(venueVolumeMap)
+            .sort((a,b) => b[1] - a[1]) 
+            .slice(0, 10) 
+            .map(([venue, count]) => ({ venue, count }));
+
+        let topVenuesHtml = "";
+        topVenuesArray.forEach(v => {
+            topVenuesHtml += `<div class="venue-pill"><span class="venue-pill-name">${v.venue}</span><span class="venue-pill-count">${v.count}</span></div>`;
+        });
+        if(topVenuesHtml === "") topVenuesHtml = '<div class="text-muted small">No venue data found</div>';
+        $("#topVenuesContainer").html(topVenuesHtml);
+
+        let filterOptions = `<option value="all">✅ Any Dispatcher</option>`;
+        let excludeOptions = `<option value="none">🚫 Exclude Dispatcher...</option>`;
+        
+        Array.from(allDispatchersFound).sort().forEach(disp => {
+            filterOptions += `<option value="${disp}">${disp}</option>`;
+            excludeOptions += `<option value="${disp}">${disp}</option>`;
+        });
+        
+        $("#modernInclude").html(filterOptions);
+        $("#modernExclude").html(excludeOptions);
+        clearAllFilters();
+
         $("#totalCombinedCost").text(`$${Math.round(combinedTotal).toLocaleString()}`);
         $("#trueAvgCost").text(`$${Math.round(combinedTotal / totalSites).toLocaleString()}`);
         $("#totalIcPayments").text(`$${Math.round(icJobPay).toLocaleString()}`);
@@ -879,12 +1133,16 @@
         $("#uniqueVisits").text(totalSites.toLocaleString());
         $("#visitSplit").text(`IC: ${icLocs.size} | FA: ${faLocs.size}`);
         $("#escCount").text(escCount);
-        $("#exceptionTotal").text(Object.values(exMap).reduce((a,b)=>a+b,0));
+        
+        let totalExceptionsOverall = 0;
+        Object.values(exMap).forEach(venueDict => {
+            Object.values(venueDict).forEach(count => totalExceptionsOverall += count);
+        });
+        $("#exceptionTotal").text(totalExceptionsOverall);
         
         let ownerHtml = "";
         let grandTotalSites = 0, grandTotalPay = 0;
         
-        // Initialize Raw Arrays for PDF Engine
         let pdfRegularRoutes = [];
         let pdfRegularSubtotal = [];
         let pdfEscalationRoutes = [];
@@ -928,13 +1186,31 @@
         
         let exHtml = "";
         let pdfExceptions = [];
-        Object.entries(exMap).forEach(([k,v]) => { 
-            exHtml += `<div style="display:flex; justify-content:space-between; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:6px;"><span class="small fw-bold text-muted">${k}</span><span class="fw-800 text-danger">${v}</span></div>`; 
-            pdfExceptions.push([k, v.toString()]);
+        
+        Object.entries(exMap).forEach(([reason, venueDict]) => { 
+            let reasonTotal = Object.values(venueDict).reduce((a,b)=>a+b, 0);
+            
+            if (reasonTotal > 0) {
+                exHtml += `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:6px; padding:10px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
+                        <span class="small fw-bold text-muted">${reason}</span>
+                        <span class="fw-800 text-danger">${reasonTotal}</span>
+                    </div>
+                    <div class="exception-venue-list">`;
+                
+                let venueListForPdf = [];
+                Object.entries(venueDict).sort((a,b)=>b[1]-a[1]).forEach(([vName, vCount]) => {
+                    exHtml += `<div class="exception-venue-item"><span>${vName}</span><span class="fw-600">${vCount}</span></div>`;
+                    venueListForPdf.push({venue: vName, count: vCount});
+                });
+                
+                exHtml += `</div></div>`;
+                pdfExceptions.push({ reason: reason, total: reasonTotal, venues: venueListForPdf });
+            }
         });
+        
         $("#ex-summary").html(exHtml);
 
-        // Store pure raw data globally so the PDF engine can read it securely
         window.pdfExportData = {
             totalCost: `$${Math.round(combinedTotal).toLocaleString()}`,
             totalAvg: `Avg: $${Math.round(combinedTotal / totalSites).toLocaleString()} / Site`,
@@ -945,7 +1221,8 @@
             uniqueSites: totalSites.toLocaleString(),
             siteSplit: `IC: ${icLocs.size} | FA: ${faLocs.size}`,
             escalations: escCount.toString(),
-            exceptions: Object.values(exMap).reduce((a,b)=>a+b,0).toString(),
+            exceptions: totalExceptionsOverall.toString(),
+            topVenues: topVenuesArray,
             regularRoutes: pdfRegularRoutes,
             regularSubtotal: pdfRegularSubtotal,
             escalationRoutes: pdfEscalationRoutes,
@@ -954,12 +1231,45 @@
             exceptionBreakdown: pdfExceptions
         };
 
+        document.getElementById('contractorListEmpty').style.display = "none";
+
         let pillHtml = "";
         Object.entries(contractorMap).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([name, stats], idx) => {
             const overallAvg = stats.uniqueVids.size > 0 ? Math.round(stats.totalPay / stats.uniqueVids.size) : 0;
-            pillHtml += `<div class="contractor-pill shadow-sm"><div class="contractor-header" onclick="toggleDrill(${idx})"><div class="contractor-name">${name}</div><div class="pill-stat"><span class="pill-label-drill">Owner</span><span class="pill-val text-muted">${stats.dispatcher}</span></div><div class="pill-stat"><span class="pill-label-drill">Sites</span><span class="pill-val">${stats.uniqueVids.size}</span></div><div class="pill-stat"><span class="pill-label-drill">Pay</span><span class="pill-val text-primary">$${stats.totalPay.toLocaleString()}</span></div><div class="pill-stat"><span class="pill-label-drill">Avg</span><span class="pill-val fw-800">$${overallAvg.toLocaleString()}</span></div></div><div class="contractor-details" id="drill-${idx}"><table class="detail-data-table shadow-sm"><thead><tr><th>Work Order #</th><th># of stops</th><th>Sum of Rate</th><th>Avg / Stop</th></tr></thead><tbody>${Object.entries(stats.jobs).map(([wo, job]) => `<tr><td>${wo}</td><td>${job.vids.size}</td><td>$${job.rate.toLocaleString()}</td><td class="fw-800">$${Math.round(job.rate / (job.vids.size || 1)).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>`;
+            const searchName = name.toLowerCase();
+            const filterDispatcher = stats.dispatcher;
+            
+            // Extract all WOs into a single string for searching
+            const allWos = Object.keys(stats.jobs).join(" ").toLowerCase();
+            
+            pillHtml += `<div class="contractor-item-wrapper" 
+                    data-name="${searchName}" 
+                    data-wos="${allWos}"
+                    data-dispatcher="${filterDispatcher}"
+                    data-pay="${stats.totalPay}"
+                    data-sites="${stats.uniqueVids.size}"
+                    data-avg="${overallAvg}">
+                <div class="contractor-pill shadow-sm">
+                    <div class="contractor-header" onclick="toggleDrill(${idx})">
+                        <div class="contractor-name">${name}</div>
+                        <div class="pill-stat"><span class="pill-label-drill">Owner</span><span class="pill-val text-muted">${stats.dispatcher}</span></div>
+                        <div class="pill-stat"><span class="pill-label-drill">Sites</span><span class="pill-val">${stats.uniqueVids.size}</span></div>
+                        <div class="pill-stat"><span class="pill-label-drill">Pay</span><span class="pill-val text-primary">$${stats.totalPay.toLocaleString()}</span></div>
+                        <div class="pill-stat"><span class="pill-label-drill">Avg</span><span class="pill-val fw-800">$${overallAvg.toLocaleString()}</span></div>
+                    </div>
+                    <div class="contractor-details" id="drill-${idx}">
+                        <table class="detail-data-table shadow-sm">
+                            <thead><tr><th>Work Order #</th><th># of stops</th><th>Sum of Rate</th><th>Avg / Stop</th></tr></thead>
+                            <tbody>${Object.entries(stats.jobs).map(([wo, job]) => `<tr><td>${wo}</td><td>${job.vids.size}</td><td>$${job.rate.toLocaleString()}</td><td class="fw-800">$${Math.round(job.rate / (job.vids.size || 1)).toLocaleString()}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>`;
         });
-        $("#contractorList").html(pillHtml);
+        
+        $("#contractorListInner").html(pillHtml);
+        
+        applyFiltersAndSort();
 
         document.getElementById('datePill').style.display = 'block';
         document.getElementById('periodValueText').innerText = currentLabel;
