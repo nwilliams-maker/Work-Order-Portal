@@ -13,45 +13,27 @@
             --card-border: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); margin: 0; }
-        
-        /* SIDEBAR */
         .sidebar { width: 280px; background: var(--sidebar); color: white; height: 100vh; padding: 2rem 1.2rem; position: fixed; z-index: 1000; display: flex; flex-direction: column; }
         .main { margin-left: 280px; padding: 2rem 4rem; }
-        
         .btn-upload { background: var(--accent); border: none; border-radius: 10px; padding: 12px; font-weight: 700; width: 100%; color: white; cursor: pointer; text-align: center; display: block; margin-bottom: 10px; text-decoration: none;}
         .btn-batch { background: #475569; border: none; border-radius: 8px; padding: 10px; font-weight: 700; width: 100%; color: white; cursor: pointer; font-size: 0.75rem; text-align: center; display: block; margin-bottom: 10px; }
         .btn-save { background: var(--success); border: none; border-radius: 10px; padding: 10px; font-weight: 700; color: white; cursor: pointer; width: 100%; display: none; margin-bottom: 15px; }
-
         .sync-panel { display: flex; gap: 8px; margin-bottom: 20px; }
         .btn-sync { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px; color: #cbd5e1; flex: 1; font-size: 0.65rem; font-weight: 700; cursor: pointer; text-align: center; }
-
-        /* FIXED SIDEBAR LAYOUT */
         .history-section { flex-grow: 1; overflow-y: auto; margin-top: 1rem; }
-        .history-title { font-size: 0.55rem; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 15px; }
         .month-header { font-size: 0.7rem; font-weight: 800; color: white; text-transform: uppercase; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border: 1px solid rgba(255,255,255,0.05); }
         .month-content { display: none; padding-left: 5px; margin-bottom: 10px; }
-        
         .history-badge-container { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; padding-right: 5px; }
-        .merge-checkbox { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer; border-radius: 4px; }
-        .history-badge { 
-            flex-grow: 1; background: transparent; border: none; color: #94a3b8; 
-            padding: 8px 5px; border-radius: 6px; font-size: 0.7rem; text-align: left; 
-            font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .history-badge:hover { color: white; background: rgba(255,255,255,0.05); }
-        .history-badge.active-badge { background: var(--accent); color: white; padding-left: 12px; }
-        
+        .merge-checkbox { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--accent); cursor: pointer; }
+        .history-badge { flex-grow: 1; background: transparent; border: none; color: #94a3b8; padding: 8px 5px; border-radius: 6px; font-size: 0.7rem; text-align: left; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-badge.active-badge { background: var(--accent); color: white; }
         .bulk-action-row { display: flex; gap: 5px; }
         .btn-select-all, .btn-clear-all { background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #cbd5e1; font-size: 0.55rem; font-weight: 800; padding: 4px 6px; text-transform: uppercase; cursor: pointer; flex: 1; }
-
-        /* KPI & GRID */
         .kpi-card { background: white; border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; height: 100%; position: relative; }
         .master-value { font-size: 3rem; font-weight: 800; color: var(--accent); letter-spacing: -0.05em; margin: 0.5rem 0; }
         .avg-pill { position: absolute; top: 1.25rem; right: 1.5rem; background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.7rem; }
         .pill-label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .card-input { border: none; border-bottom: 1px dashed var(--card-border); font-weight: 700; width: 60px; text-align: right; background: transparent; outline: none; }
-
-        /* DISPATCHER DETAIL */
         .contractor-pill { background: white; border: 1px solid var(--card-border); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
         .contractor-header { padding: 1.25rem 2rem; display: flex; align-items: center; cursor: pointer; }
         .contractor-name { font-weight: 700; font-size: 1.05rem; color: var(--accent); flex: 1; }
@@ -59,24 +41,19 @@
         .pill-stat { text-align: center; }
         .pill-label-drill { font-size: 0.55rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: -2px; }
         .pill-val { font-size: 0.9rem; font-weight: 700; color: var(--text-main); }
-
         .contractor-details { display: none; padding: 0 1rem 1rem 1rem; }
         .detail-data-table { width: 100%; border-radius: 8px; overflow: hidden; font-size: 0.8rem; }
         .detail-data-table th { background: #e2e8f0; color: var(--text-muted); text-transform: uppercase; font-size: 0.6rem; font-weight: 800; padding: 10px 15px; }
         .detail-data-table td { background: white; border-top: 1px solid #f1f5f9; padding: 12px 15px; font-weight: 600; }
-
-        /* EXCEPTIONS BREAKDOWN */
         .exception-card { background: #f8fafc; border: 1px solid var(--card-border); border-radius: 12px; margin-bottom: 8px; cursor: pointer; overflow: hidden; }
         .exception-header { padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
         .exception-details { display: none; padding: 10px 15px; background: white; border-top: 1px solid #f1f5f9; font-size: 0.75rem; }
-
         .nav-link { border: none !important; color: var(--text-muted); font-weight: 700; cursor: pointer; padding: 10px 20px; }
         .nav-link.active { color: var(--accent); border-bottom: 3px solid var(--accent) !important; background: transparent !important; }
         .search-container { background: white; border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 2rem; display: flex; gap: 1rem; }
     </style>
 </head>
 <body>
-
 <div class="sidebar">
     <h2 class="fw-800 mb-4">OpsCenter</h2>
     <label class="btn-upload">Upload Report <input type="file" id="csvFile" accept=".csv" hidden></label>
@@ -103,7 +80,6 @@
         <div id="historyBadges"></div>
     </div>
 </div>
-
 <div class="main">
     <header class="header-bar d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-800 mb-0">Financial Command</h1>
@@ -112,12 +88,10 @@
             <div id="datePill" class="badge bg-white text-primary border p-2 shadow-sm" style="display:none; border-radius: 8px;"><span id="periodValueText">--</span></div>
         </div>
     </header>
-
     <ul class="nav nav-tabs mb-4">
         <li class="nav-item"><a class="nav-link active" onclick="switchTab('command')" id="tab-dashboard">Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" onclick="switchTab('details')" id="tab-details">Dispatcher Detail</a></li>
     </ul>
-
     <div id="view-command">
         <div class="row g-3 mb-4">
             <div class="col-xl-4"><div class="kpi-card shadow-sm"><span class="pill-label">Total Combined Cost</span><div class="master-value" id="totalCombinedCost">$0</div><span class="fw-700 text-muted small">Combined Avg: <span id="trueAvgCost" class="text-dark fw-800">$0</span> / Site</span></div></div>
@@ -150,7 +124,6 @@
             <div class="col-lg-4"><h6 class="fw-800 mb-3 text-muted small text-uppercase">Exception Breakdown</h6><div id="ex-summary"></div></div>
         </div>
     </div>
-
     <div id="view-details" style="display:none;">
         <div class="search-container shadow-sm">
             <input type="text" id="modernSearch" class="form-control border-0" placeholder="Search tech name or WO#..." onkeyup="applyFiltersAndSort()">
@@ -159,30 +132,22 @@
         <div id="contractorList"></div>
     </div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
 <script>
     let currentData = null, currentLabel = "";
     function getArchiveData() { try { let s = localStorage.getItem('opsArchive'); return s ? JSON.parse(LZString.decompressFromUTF16(s)) : {}; } catch(e) { return {}; } }
     function saveArchiveData(obj) { localStorage.setItem('opsArchive', LZString.compressToUTF16(JSON.stringify(obj))); }
-
     $(document).ready(() => { 
-        loadFromStorage(); 
-        updateCalculations();
+        loadFromStorage(); updateCalculations();
         document.getElementById('importFile').addEventListener('change', e => { 
-            const r = new FileReader(); 
-            r.onload = ev => { try { const d = JSON.parse(ev.target.result); let arc = getArchiveData(); Object.assign(arc, d); saveArchiveData(arc); loadFromStorage(); } catch(err) { alert("Invalid import format."); } }; 
-            r.readAsText(e.target.files[0]); 
+            const r = new FileReader(); r.onload = ev => { try { const d = JSON.parse(ev.target.result); let arc = getArchiveData(); Object.assign(arc, d); saveArchiveData(arc); loadFromStorage(); } catch(err) { alert("Invalid import."); } }; r.readAsText(e.target.files[0]); 
         });
     });
-
     function updateCalculations() { if (currentData) processData(currentData); else { const f = parseFloat($('#inputFleet').val())||0, p = parseFloat($('#inputPayroll').val())||0; $('#mainCteDisplay').text(`$${(f+p).toLocaleString()}`); } }
-
     function getDispatcherName(str) {
         if (!str || str.trim() === "" || str.trim().toLowerCase() === "unassigned") return 'David Borochov';
         let clean = str.replace(/ Total/g, '').trim();
@@ -190,9 +155,8 @@
         if (clean.includes("Karen") || clean.includes("Yusep")) return "Karen Heiden";
         let people = clean.split(',').map(p => p.trim());
         if (people.length > 1) { const filtered = people.filter(p => !p.includes("Matt Shanks")); if (filtered.length > 0) people = filtered; }
-        return people[people.length - 1] === "Unassigned" ? "David Borochov" : people[people.length-1]; 
+        return people[people.length - 1]; 
     }
-
     function processData(data) {
         if (!data) return;
         const f = parseFloat($('#inputFleet').val())||0, p = parseFloat($('#inputPayroll').val())||0, cte = f+p;
@@ -205,11 +169,12 @@
             const dispatcher = getDispatcherName(ownerRaw);
             const vid = (row['VID'] || row['Address'] || "").toString().trim(); if (!vid) return;
             globalLocs.add(vid);
-            const isFA = (row['IC/FA']||"").trim().toUpperCase() === "FA";
+            const typeFlag = (row['IC/FA']||"").trim().toUpperCase();
+            const isFA = typeFlag === "FA";
             const taskType = (row['task_type']||"").toLowerCase();
             const isEsc = (row['Escalation']||"").trim().toUpperCase() === "YES" || taskType.includes('escalation') || ownerRaw.includes("Matt Shanks");
 
-            if (isFA) faLocs.add(vid);
+            if (isFA) { faLocs.add(vid); }
             else {
                 icLocs.add(vid);
                 const rate = Math.round(parseFloat((row['SUM of Rate']||row['Rate']||"0").toString().replace(/[$,]/g, ''))) || 0;
@@ -217,7 +182,6 @@
                 const group = isEsc ? 'escalations' : 'regular';
                 if (!ownerMap[group][dispatcher]) ownerMap[group][dispatcher] = { pay: 0, vids: new Set() };
                 ownerMap[group][dispatcher].pay += rate; ownerMap[group][dispatcher].vids.add(vid);
-
                 const assigned = (row['Assigned to']|| row['Technician'] || "").trim();
                 const wo = (row['Work Order Number']|| row['WO #'] || '--').toString().trim();
                 if (assigned && assigned.toLowerCase() !== 'unassigned') {
@@ -227,12 +191,11 @@
                     contractorMap[assigned].jobs[wo].rate += rate; contractorMap[assigned].jobs[wo].stops.add(vid);
                 }
             }
-            const reason = row['Exception Reason'], venue = row['Venue Name'] || "Unknown";
-            if (reason && reason !== "Pending") {
-                let rKey = null; const lowR = reason.toLowerCase();
-                if (lowR.includes("closed")) rKey = "Venue Closed"; else if (lowR.includes("missing")) rKey = "Kiosk Missing"; else if (lowR.includes("refusal") || lowR.includes("refused")) rKey = "Refusal"; else if (lowR.includes("damaged")) rKey = "Damaged";
-                if (rKey) { if (!exMap[rKey][venue]) exMap[rKey][venue] = 0; exMap[rKey][venue]++; }
-            }
+            const status = (row['Exception Reason'] || "").toLowerCase();
+            if (status.includes("closed")) exMap["Venue Closed"][row['Venue Name'] || vid] = (exMap["Venue Closed"][row['Venue Name'] || vid] || 0) + 1;
+            else if (status.includes("missing")) exMap["Kiosk Missing"][row['Venue Name'] || vid] = (exMap["Kiosk Missing"][row['Venue Name'] || vid] || 0) + 1;
+            else if (status.includes("refusal") || status.includes("refused")) exMap["Refusal"][row['Venue Name'] || vid] = (exMap["Refusal"][row['Venue Name'] || vid] || 0) + 1;
+            else if (status.includes("damaged")) exMap["Damaged"][row['Venue Name'] || vid] = (exMap["Damaged"][row['Venue Name'] || vid] || 0) + 1;
             if (isEsc) escTotal++;
         });
 
@@ -248,32 +211,46 @@
         $("#faCostPerVisit").text(`$${(faLocs.size>0 ? Math.round(cte/faLocs.size) : 0)}`);
 
         let oHtml = "", rS = 0, rP = 0, eS = 0, eP = 0, pdfR = [], pdfE = [];
-        oHtml += `<tr><td colspan="4" class="bg-light fw-bold text-uppercase small py-2 px-3">Regular Routes</td></tr>`;
+        oHtml += `<tr><td colspan="4" class="bg-light fw-bold text-uppercase small py-2 px-3">REGULAR ROUTES</td></tr>`;
         Object.entries(ownerMap.regular).sort((a,b)=>b[1].pay-a[1].pay).forEach(([n, d]) => {
             const pStr = '$'+d.pay.toLocaleString(), aStr = '$'+Math.round(d.pay/d.vids.size).toLocaleString();
             oHtml += `<tr><td class="ps-3">${n}</td><td class="text-center">${d.vids.size}</td><td class="text-primary fw-bold">${pStr}</td><td>${aStr}</td></tr>`;
-            pdfR.push([n, d.vids.size.toString(), pStr, aStr]);
-            rS += d.vids.size; rP += d.pay;
+            pdfR.push([n, d.vids.size.toString(), pStr, aStr]); rS += d.vids.size; rP += d.pay;
         });
         oHtml += `<tr class="fw-bold table-light text-primary"><td>Regular Subtotal:</td><td class="text-center">${rS}</td><td>$${rP.toLocaleString()}</td><td>$${Math.round(rP/(rS||1)).toLocaleString()}</td></tr>`;
-        oHtml += `<tr><td colspan="4" class="bg-light fw-bold text-uppercase small py-2 px-3">Escalations & Rollouts</td></tr>`;
+        oHtml += `<tr><td colspan="4" class="bg-light fw-bold text-uppercase small py-2 px-3">ESCALATIONS & ROLLOUTS</td></tr>`;
         Object.entries(ownerMap.escalations).sort((a,b)=>b[1].pay-a[1].pay).forEach(([n, d]) => {
             const pStr = '$'+d.pay.toLocaleString(), aStr = '$'+Math.round(d.pay/d.vids.size).toLocaleString();
             oHtml += `<tr><td class="ps-3">${n}</td><td class="text-center">${d.vids.size}</td><td class="text-primary fw-bold">${pStr}</td><td>${aStr}</td></tr>`;
-            pdfE.push([n, d.vids.size.toString(), pStr, aStr]);
-            eS += d.vids.size; eP += d.pay;
+            pdfE.push([n, d.vids.size.toString(), pStr, aStr]); eS += d.vids.size; eP += d.pay;
         });
         oHtml += `<tr class="fw-bold table-secondary"><td>GRAND TOTAL:</td><td class="text-center">${rS+eS}</td><td>$${(rP+eP).toLocaleString()}</td><td>$${Math.round((rP+eP)/((rS+eS)||1)).toLocaleString()}</td></tr>`;
         $("#ownerBody").html(oHtml);
 
-        let exHtml = "", pdfEx = [];
+        let exHtml = "", pdfExTableData = [];
+        let totalExCount = 0;
         Object.entries(exMap).forEach(([reason, venues]) => {
-            const count = Object.values(venues).reduce((a,b)=>a+b, 0);
-            pdfEx.push([reason, count.toString()]);
-            exHtml += `<div class="exception-card shadow-sm" onclick="$(this).find('.exception-details').slideToggle(150)"><div class="exception-header"><b>${reason}</b><span class="badge bg-danger rounded-pill">${count}</span></div><div class="exception-details">${Object.entries(venues).map(([v,c])=>`<div class="d-flex justify-content-between py-1 border-bottom"><span>${v}</span><b>${c}</b></div>`).join('')}</div></div>`;
+            const reasonCount = Object.values(venues).reduce((a,b)=>a+b, 0);
+            totalExCount += reasonCount;
+            exHtml += `<div class="exception-card shadow-sm" onclick="$(this).find('.exception-details').slideToggle(150)"><div class="exception-header"><b>${reason}</b><span class="badge bg-danger rounded-pill">${reasonCount}</span></div><div class="exception-details">${Object.entries(venues).map(([v,c])=>`<div class="d-flex justify-content-between py-1 border-bottom"><span>${v}</span><b>${c}</b></div>`).join('')}</div></div>`;
+            Object.entries(venues).forEach(([venue, count]) => {
+                pdfExTableData.push([venue, count.toString()]);
+            });
         });
         $("#ex-summary").html(exHtml);
-        window.pdfExportData = { combined: $("#totalCombinedCost").text(), combinedAvg: "Avg: "+$("#trueAvgCost").text()+"/Site", cte: $("#mainCteDisplay").text(), cteDetails: "Fleet: $"+f.toLocaleString()+" | Payroll: $"+p.toLocaleString(), ic: $("#totalIcPayments").text(), icAvg: "Avg: "+$("#icCostPerVisit").text()+"/Site", sites: globalLocs.size.toString(), icFaSplit: "IC: "+icLocs.size+" | FA: "+faLocs.size, esc: escTotal.toString(), exTotal: Object.values(exMap).reduce((a,v)=>a+Object.values(v).reduce((x,y)=>x+y,0),0).toString(), regular: pdfR, regSub: ["Regular Subtotal:", rS.toString(), "$"+rP.toLocaleString(), "$"+Math.round(rP/(rS||1)).toLocaleString()], escalation: pdfE, escSub: ["Escalations Subtotal:", eS.toString(), "$"+eP.toLocaleString(), "$"+Math.round(eP/(eS||1)).toLocaleString()], grandTotal: ["GRAND TOTAL:", (rS+eS).toString(), "$"+(rP+eP).toLocaleString(), "$"+Math.round((rP+eP)/((rS+eS)||1)).toLocaleString()], exceptions: pdfEx };
+        $("#exceptionTotal").text(totalExCount);
+
+        window.pdfExportData = { 
+            combined: $("#totalCombinedCost").text(), combinedAvg: "Avg: "+$("#trueAvgCost").text()+"/Site", 
+            cte: $("#mainCteDisplay").text(), cteDetails: "Fleet: $"+f.toLocaleString()+" | Payroll: $"+p.toLocaleString(), 
+            ic: $("#totalIcPayments").text(), icAvg: "Avg: "+$("#icCostPerVisit").text()+"/Site", 
+            sites: globalLocs.size.toString(), icFaSplit: "IC: "+icLocs.size+" | FA: "+faLocs.size, 
+            esc: escTotal.toString(), exTotal: totalExCount.toString(), 
+            regular: pdfR, regSub: ["Regular Subtotal:", rS.toString(), "$"+rP.toLocaleString(), "$"+Math.round(rP/(rS||1)).toLocaleString()], 
+            escalation: pdfE, escSub: ["Escalations Subtotal:", eS.toString(), "$"+eP.toLocaleString(), "$"+Math.round(eP/(eS||1)).toLocaleString()], 
+            grandTotal: ["GRAND TOTAL:", (rS+eS).toString(), "$"+(rP+eP).toLocaleString(), "$"+Math.round((rP+eP)/((rS+eS)||1)).toLocaleString()], 
+            exceptions: pdfExTableData 
+        };
         
         let pillHtml = "";
         Object.entries(contractorMap).sort((a,b)=>b[1].pay-a[1].pay).forEach(([name, stats]) => {
@@ -281,33 +258,28 @@
         });
         $("#contractorList").html(pillHtml);
     }
-
     function applyFiltersAndSort() {
         const term = $('#modernSearch').val().toLowerCase(), sort = $('#modernSort').val(), items = $('.contractor-item-wrapper').get();
         items.sort((a,b) => { if(sort === 'pay-desc') return b.dataset.pay - a.dataset.pay; if(sort === 'sites-desc') return b.dataset.sites - a.dataset.sites; return a.dataset.name.localeCompare(b.dataset.name); });
         items.forEach(item => { $(item).toggle(!term || item.dataset.name.includes(term) || item.dataset.wos.includes(term)); $('#contractorList').append(item); });
     }
-
     function toggleSelectAll(state) { $('.merge-checkbox').prop('checked', state); checkSelectionState(); }
-
     function loadFromStorage() {
         const arc = getArchiveData(), grouped = {}, mF = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
         Object.keys(arc).forEach(l => {
-            let found = "OTHER REPORTS"; const up = l.toUpperCase();
-            mF.forEach(m => { if (up.includes(m) || up.includes(m.substring(0,3))) { const year = up.match(/\d{4}/); if (year) found = m + " " + year[0]; } });
-            if(!grouped[found]) grouped[found] = []; grouped[found].push(l);
+            let f = "OTHER REPORTS"; const up = l.toUpperCase();
+            mF.forEach(m => { if (up.includes(m) || up.includes(m.substring(0,3))) { const year = up.match(/\d{4}/); if (year) f = m + " " + year[0]; } });
+            if(!grouped[f]) grouped[f] = []; grouped[f].push(l);
         });
         let html = "";
-        Object.entries(grouped).sort((a,b) => { if(a[0]==="OTHER REPORTS") return 1; if(b[0]==="OTHER REPORTS") return -1; return new Date(b[0])-new Date(a[0]); }).forEach(([month, labels]) => {
+        Object.entries(grouped).sort((a,b) => { if (a[0] === "OTHER REPORTS") return 1; if (b[0] === "OTHER REPORTS") return -1; return new Date(b[0]) - new Date(a[0]); }).forEach(([month, labels]) => {
             const gid = month.replace(/\s/g, '');
             labels.sort((a,b) => { let d1 = parseDateSafe(a.split('-')[0]), d2 = parseDateSafe(b.split('-')[0]); return d2 - d1; });
             html += `<div class="month-header" onclick="$('#${gid}').slideToggle(150)">${month} <span>▼</span></div><div class="month-content" id="${gid}">${labels.map(l => `<div class="history-badge-container"><input type="checkbox" class="merge-checkbox" value="${l}" onchange="checkSelectionState()"><button class="history-badge ${l===currentLabel?'active-badge':''}" onclick="loadArchivedReport('${l}', this)">${l}</button></div>`).join('')}</div>`;
         });
         $("#historyBadges").html(html);
     }
-
     function parseDateSafe(s) { if (!s) return null; let d = new Date(s.trim()); if (isNaN(d.getTime())) { let p = s.split('/'); if (p.length === 3) d = new Date(`${p[2]}-${p[0]}-${p[1]}`); } return isNaN(d.getTime()) ? null : d; }
-
     function mergeSelectedReports() {
         const arc = getArchiveData(); let m = [], dates = [];
         $('.merge-checkbox:checked').each(function() { const l = $(this).val(); if (arc[l]) { m = m.concat(arc[l]); arc[l].forEach(row => { let d = parseDateSafe(row['Date Visited']||row['Visit Date']); if(d) dates.push(d); }); } });
@@ -316,38 +288,97 @@
             processData(m); $('#saveBtn').show();
         }
     }
-
     function deleteSelectedReports() { if (!confirm("Delete selected?")) return; let arc = getArchiveData(); $('.merge-checkbox:checked').each(function() { delete arc[$(this).val()]; }); saveArchiveData(arc); loadFromStorage(); }
     function loadArchivedReport(l, btn) { currentData = getArchiveData()[l]; currentLabel = l; processData(currentData); $('.history-badge').removeClass('active-badge'); $(btn).addClass('active-badge'); $('#saveBtn').hide(); $('#pdfBtn, #datePill').show(); $('#periodValueText').text(l); }
     function persistCurrentReport() { let arc = getArchiveData(); arc[currentLabel] = currentData; saveArchiveData(arc); loadFromStorage(); $('#saveBtn').hide(); }
     function checkSelectionState() { $('#selectionPanel').toggle($('.merge-checkbox:checked').length > 0); }
     function switchTab(t) { $('.nav-link').removeClass('active'); if(t==='command') { $('#view-command').show(); $('#view-details').hide(); $('#tab-dashboard').addClass('active'); } else { $('#view-command').hide(); $('#view-details').show(); $('#tab-details').addClass('active'); } }
-
+    
+    // FINAL PDF ENGINE MATCHING IMAGE COLOR CODING
     function downloadNativePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'pt', 'letter'); const d = window.pdfExportData;
-        doc.setFontSize(22); doc.setTextColor(15,23,42); doc.setFont("helvetica", "bold"); doc.text("OpsCenter Financial Overview", 40, 50); doc.setFontSize(12); doc.setTextColor(100); doc.setFont("helvetica", "normal"); doc.text(currentLabel, 40, 70);
-        doc.autoTable({ startY: 90, head: [['Total Combined Cost', 'Fixed CTE Total', 'IC Job Pay']], body: [[d.combined, d.cte, d.ic], [d.combinedAvg, d.cteDetails, d.icAvg]], theme: 'grid', styles: {fontSize: 9}, didParseCell: function(data) { if(data.row.index === 0) { data.cell.styles.fontSize = 18; data.cell.styles.fontStyle = 'bold'; } } });
-        doc.autoTable({ startY: doc.lastAutoTable.finalY + 15, head: [['Unique Sites', 'Escalations', 'Exceptions']], body: [[d.sites, d.esc, d.exTotal], [d.icFaSplit, '', '']], theme: 'grid', styles: {fontSize: 9}, didParseCell: function(data) { if(data.row.index === 0) { data.cell.styles.fontSize = 18; data.cell.styles.fontStyle = 'bold'; } } });
-        let body = [[{content: 'REGULAR ROUTES', colSpan: 4, styles: {fillColor: [240,240,240], fontStyle: 'bold'}}]];
-        body = body.concat(d.regular); body.push([{content: d.regSub[0], styles: {fontStyle: 'bold'}}, d.regSub[1], d.regSub[2], d.regSub[3]]);
-        body.push([{content: 'ESCALATIONS & ROLLOUTS', colSpan: 4, styles: {fillColor: [240,240,240], fontStyle: 'bold'}}]);
-        body = body.concat(d.escalation); body.push([{content: d.escSub[0], styles: {fontStyle: 'bold'}}, d.escSub[1], d.escSub[2], d.escSub[3]]);
-        body.push([{content: d.grandTotal[0], styles: {fillColor: [230,230,230], fontStyle: 'bold'}}, d.grandTotal[1], d.grandTotal[2], d.grandTotal[3]]);
-        doc.autoTable({ startY: doc.lastAutoTable.finalY + 30, margin: {right: 230}, head: [['Dispatcher', 'Sites', 'Total Pay', 'Avg / Site']], body, theme: 'grid', styles: {fontSize: 8} });
-        doc.autoTable({ startY: doc.lastAutoTable.finalY - (body.length * 12.5) - 22, margin: {left: 410}, head: [['Exception Reason', 'Count']], body: d.exceptions, theme: 'grid', styles: {fontSize: 8} });
+        doc.setFontSize(22); doc.setTextColor(15,23,42); doc.setFont("helvetica", "bold"); doc.text("OpsCenter Financial Overview", 40, 50); 
+        doc.setFontSize(12); doc.setTextColor(100); doc.setFont("helvetica", "normal"); doc.text(currentLabel, 40, 70);
+        
+        // 1. FINANCIAL KPI SECTION (Removed Fill)
+        doc.autoTable({ 
+            startY: 90, 
+            head: [['Total Combined Cost', 'Fixed CTE Total', 'IC Job Pay']], 
+            body: [[d.combined, d.cte, d.ic], [d.combinedAvg, d.cteDetails, d.icAvg]], 
+            theme: 'grid', 
+            styles: {fontSize: 9, halign: 'center', fillColor: false}, // No fill
+            headStyles: {fillColor: false, textColor: [100, 100, 100]}, // Subtle text
+            didParseCell: function(data) { 
+                if(data.row.index === 0) { 
+                    data.cell.styles.fontSize = 18; data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.textColor = [37, 99, 235]; // Royal Blue
+                } else if (data.row.index === 1 && (data.column.index === 0 || data.column.index === 2)) {
+                    data.cell.styles.textColor = [16, 185, 129]; // Vibrant Green
+                }
+            } 
+        });
+
+        // 2. OPERATIONAL KPI SECTION (Removed Fill)
+        doc.autoTable({ 
+            startY: doc.lastAutoTable.finalY + 15, 
+            head: [['Unique Sites', 'Escalations', 'Exceptions']], 
+            body: [[d.sites, d.esc, d.exTotal], [d.icFaSplit, '', '']], 
+            theme: 'grid', 
+            styles: {fontSize: 9, halign: 'center', fillColor: false}, 
+            headStyles: {fillColor: false, textColor: [100, 100, 100]},
+            didParseCell: function(data) { 
+                if(data.row.index === 0) { 
+                    data.cell.styles.fontSize = 18; data.cell.styles.fontStyle = 'bold';
+                    if (data.column.index === 1) data.cell.styles.textColor = [245, 158, 11]; // Amber
+                    if (data.column.index === 2) data.cell.styles.textColor = [225, 29, 72]; // Ruby Red
+                } 
+            } 
+        });
+
+        // 3. DISPATCHER & EXCEPTION TABLES
+        let dispatcherBody = [];
+        dispatcherBody.push([{content: 'REGULAR ROUTES', colSpan: 4, styles: {fillColor: [241, 245, 249], fontStyle: 'bold'}}]);
+        dispatcherBody = dispatcherBody.concat(d.regular);
+        dispatcherBody.push([{content: "Regular Subtotal:", styles: {halign:'right', fontStyle: 'bold'}}, "", {content: d.regSub[2], styles: {fontStyle: 'bold', textColor: [37,99,235]}}, d.regSub[3]]);
+        dispatcherBody.push([{content: 'ESCALATIONS & ROLLOUTS', colSpan: 4, styles: {fillColor: [241, 245, 249], fontStyle: 'bold'}}]);
+        dispatcherBody = dispatcherBody.concat(d.escalation);
+        dispatcherBody.push([{content: "Escalations Subtotal:", styles: {halign:'right', fontStyle: 'bold'}}, "", {content: d.escSub[2], styles: {fontStyle: 'bold', textColor: [37,99,235]}}, d.escSub[3]]);
+        dispatcherBody.push([{content: d.grandTotal[0], styles: {fillColor: [226, 232, 240], fontStyle: 'bold', halign:'right'}}, d.grandTotal[1], {content: d.grandTotal[2], styles: {fontStyle: 'bold', textColor:[37,99,235]}}, d.grandTotal[3]]);
+
+        doc.autoTable({ 
+            startY: doc.lastAutoTable.finalY + 30, 
+            margin: {right: 230}, 
+            head: [['Dispatcher', 'Sites', 'Total Pay', 'Avg / Site']], 
+            body: dispatcherBody, 
+            theme: 'grid', 
+            styles: {fontSize: 8},
+            headStyles: {fillColor: [15, 23, 42]} // Slate header
+        });
+
+        doc.autoTable({ 
+            startY: doc.lastAutoTable.finalY - (dispatcherBody.length * 12.5) - 22, 
+            margin: {left: 410}, 
+            head: [['Venue Name', 'Count']], 
+            body: d.exceptions, 
+            theme: 'grid', 
+            styles: {fontSize: 8},
+            headStyles: {fillColor: [225, 29, 72]}, // Ruby header
+            columnStyles: { 1: {textColor: [225, 29, 72], fontStyle: 'bold', halign: 'center'} } // Ruby red count values
+        });
+
         doc.save(`OpsCenter_Overview_${currentLabel.replace(/\s/g, '_')}.pdf`);
     }
-
     document.getElementById('csvFile').addEventListener('change', e => { Papa.parse(e.target.files[0], { header: true, complete: r => { currentData = r.data; currentLabel = e.target.files[0].name.replace('.csv',''); processData(r.data); $('#saveBtn, #pdfBtn, #datePill').show(); $('#periodValueText').text(currentLabel); }}); });
-    document.getElementById('batchCsvFile').addEventListener('change', e => { Papa.parse(e.target.files[0], { header: true, complete: r => {
-        let arc = getArchiveData();
-        r.data.forEach(row => {
-            let d = parseDateSafe(row['Date Visited']||row['Visit Date']); if(!d) return;
-            let s = new Date(d); s.setDate(s.getDate() - s.getDay() + (s.getDay()===0?-6:1)); let ed = new Date(s); ed.setDate(s.getDate()+6);
-            let l = `${s.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${ed.toLocaleDateString(undefined, {month:'short', day:'numeric'})}, ${ed.getFullYear()}`;
-            if(!arc[l]) arc[l] = []; arc[l].push(row);
-        }); saveArchiveData(arc); loadFromStorage(); alert("Batch split complete.");
-    }}); });
+    document.getElementById('batchCsvFile').addEventListener('change', e => { 
+        Papa.parse(e.target.files[0], { header: true, complete: r => {
+            let arc = getArchiveData(); r.data.forEach(row => {
+                let d = parseDateSafe(row['Date Visited']||row['Visit Date']); if(!d) return;
+                let s = new Date(d); s.setDate(s.getDate()-s.getDay()+(s.getDay()===0?-6:1)); let ed = new Date(s); ed.setDate(s.getDate()+6);
+                let l = `${s.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${ed.toLocaleDateString(undefined, {month:'short', day:'numeric'})}, ${ed.getFullYear()}`;
+                if(!arc[l]) arc[l] = []; arc[l].push(row);
+            }); saveArchiveData(arc); loadFromStorage(); alert("Batch complete.");
+        }}); 
+    });
     function exportArchive() { const arc = getArchiveData(); if (Object.keys(arc).length === 0) return; const blob = new Blob([JSON.stringify(arc)], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `OpsCenter_Archive_${new Date().toISOString().split('T')[0]}.json`; a.click(); }
 </script>
 </body>
