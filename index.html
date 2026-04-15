@@ -113,17 +113,12 @@
             </div>
             <div class="col-xl-4">
                 <div class="row g-3 h-100">
-                    <div class="col-12">
-                        <div class="kpi-card shadow-sm">
-                            <span class="pill-label">Unique Sites</span>
-                            <div class="master-value" id="uniqueVisits" style="font-size: 2.5rem; margin-top: 0.2rem;">0</div>
-                            
-                            <div class="mt-2" style="font-size: 0.65rem; color: var(--text-muted); line-height: 1.4;">
-                                <div id="visitTotalLine" class="fw-700">Total: IC: 0 | FA: 0</div>
-                                <div id="visitUniqueLine" class="fw-700">Unique: IC: 0 | FA: 0</div>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="col-12"><div class="kpi-card shadow-sm"><span class="pill-label">Unique Sites</span><div class="avg-pill" style="background:#f1f5f9; color:#64748b;" id="visitSplit">IC: 0 | FA: 0</div><div class="fw-800 fs-3 mt-1" id="uniqueVisits">0</div></div></div>
+                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#fffbeb;"><span class="pill-label text-warning">Escalations</span><div class="fw-800 fs-3 mt-1 text-warning" id="escCount">0</div></div></div>
+                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#fff1f2;"><span class="pill-label text-danger">Exceptions</span><div class="fw-800 fs-3 text-danger mt-1" id="exceptionTotal">0</div></div></div>
+                </div>
+            </div>
+        </div>
         <div class="row g-4">
             <div class="col-lg-8 border-end"><table class="table align-middle small bg-white border rounded"><tbody id="ownerBody"></tbody></table></div>
             <div class="col-lg-4"><h6 class="fw-800 mb-3 text-muted small text-uppercase">Exception Breakdown</h6><div id="ex-summary"></div></div>
