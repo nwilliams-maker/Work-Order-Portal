@@ -150,8 +150,8 @@
             <div class="col-xl-4">
                 <div class="row g-3 h-100">
                     <div class="col-12"><div class="kpi-card shadow-sm"><span class="pill-label">Unique Sites</span><div class="avg-pill" style="background:#f1f5f9; color:#64748b;" id="visitSplit">IC: 0 | FA: 0</div><div class="fw-800 fs-3 mt-1" id="uniqueVisits">0</div></div></div>
-                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#eff6ff;"><span class="pill-label" style="color:#2563eb;">Unique IC</span><div class="fw-800 fs-3 mt-1" style="color:#2563eb;" id="uniqueIC">0</div></div></div>
-                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#ecfdf5;"><span class="pill-label" style="color:#10b981;">Unique FA</span><div class="fw-800 fs-3 mt-1" style="color:#10b981;" id="uniqueFA">0</div></div></div>
+                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#eff6ff;"><span class="pill-label" style="color:#2563eb;">IC Contractors</span><div class="fw-800 fs-3 mt-1" style="color:#2563eb;" id="uniqueIC">0</div></div></div>
+                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#ecfdf5;"><span class="pill-label" style="color:#10b981;">FA Contractors</span><div class="fw-800 fs-3 mt-1" style="color:#10b981;" id="uniqueFA">0</div></div></div>
                     <div class="col-6"><div class="kpi-card shadow-sm" style="background:#fffbeb;"><span class="pill-label text-warning">Escalations</span><div class="fw-800 fs-3 mt-1 text-warning" id="escCount">0</div></div></div>
                     <div class="col-6"><div class="kpi-card shadow-sm" style="background:#fff1f2;"><span class="pill-label text-danger">Exceptions</span><div class="fw-800 fs-3 text-danger mt-1" id="exceptionTotal">0</div></div></div>
                 </div>
@@ -331,7 +331,7 @@
         if (!data) return;
         const f = parseFloat($('#inputFleet').val())||0, p = parseFloat($('#inputPayroll').val())||0, cte = f+p;
         let icPay = 0, escTotal = 0;
-        const ownerMap = { regular: {}, escalations: {} }, globalLocs = new Set(), icLocs = new Set(), faLocs = new Set(), contractorMap = {};
+        const ownerMap = { regular: {}, escalations: {} }, globalLocs = new Set(), icLocs = new Set(), faLocs = new Set(), contractorMap = {}, icTechs = new Set(), faTechs = new Set();
         const exMap = { "Venue Closed": {}, "Kiosk Missing": {}, "Refusal": {}, "Damaged": {} };
         // Task type accumulators (only counts IC rows since FA rows have no per-row rate)
         const taskTypeMap = {};
@@ -352,6 +352,13 @@
             const taskType = (row['task_type']||"").toLowerCase();
             const isEsc = (row['Escalation']||"").trim().toUpperCase() === "YES" || taskType.includes('escalation') || ownerRaw.includes("Matt Shanks");
 
+            // Track unique contractor names per IC/FA group (one count per person)
+            const assignedRaw = (row['Assigned to']|| row['Technician'] || "").trim();
+            if (assignedRaw && assignedRaw.toLowerCase() !== 'unassigned') {
+                if (isFA) faTechs.add(assignedRaw);
+                else      icTechs.add(assignedRaw);
+            }
+
             if (isFA) { faLocs.add(vid); }
             else {
                 icLocs.add(vid);
@@ -360,7 +367,7 @@
                 const group = isEsc ? 'escalations' : 'regular';
                 if (!ownerMap[group][dispatcher]) ownerMap[group][dispatcher] = { pay: 0, vids: new Set() };
                 ownerMap[group][dispatcher].pay += rate; ownerMap[group][dispatcher].vids.add(vid);
-                const assigned = (row['Assigned to']|| row['Technician'] || "").trim();
+                const assigned = assignedRaw;
                 const wo = (row['Work Order Number']|| row['WO #'] || '--').toString().trim();
                 if (assigned && assigned.toLowerCase() !== 'unassigned') {
                     if (!contractorMap[assigned]) contractorMap[assigned] = { dispatcher, pay: 0, vids: new Set(), jobs: {} };
@@ -414,8 +421,8 @@
         $("#totalIcPayments").text(`$${icPay.toLocaleString()}`);
         $("#uniqueVisits").text(globalLocs.size);
         $("#visitSplit").text(`IC: ${icLocs.size} | FA: ${faLocs.size}`);
-        $("#uniqueIC").text(icLocs.size);
-        $("#uniqueFA").text(faLocs.size);
+        $("#uniqueIC").text(icTechs.size);
+        $("#uniqueFA").text(faTechs.size);
         $("#escCount").text(escTotal);
         $("#icCostPerVisit").text(`$${(icLocs.size>0 ? Math.round(icPay/icLocs.size) : 0)}`);
         $("#faCostPerVisit").text(`$${(faLocs.size>0 ? Math.round(cte/faLocs.size) : 0)}`);
@@ -459,6 +466,7 @@
             ic: $("#totalIcPayments").text(), icAvg: "Avg: "+$("#icCostPerVisit").text()+"/Site",
             sites: globalLocs.size.toString(), icFaSplit: "IC: "+icLocs.size+" | FA: "+faLocs.size,
             icSites: icLocs.size.toString(), faSites: faLocs.size.toString(),
+            icContractors: icTechs.size.toString(), faContractors: faTechs.size.toString(),
             esc: escTotal.toString(), exTotal: totalExCount.toString(),
             regular: pdfR, regSub: ["Regular Subtotal:", rS.toString(), "$"+rP.toLocaleString(), "$"+Math.round(rP/(rS||1)).toLocaleString()],
             escalation: pdfE, escSub: ["Escalations Subtotal:", eS.toString(), "$"+eP.toLocaleString(), "$"+Math.round(eP/(eS||1)).toLocaleString()],
@@ -762,8 +770,8 @@
         // 2. Operational KPI section
         doc.autoTable({
             startY: doc.lastAutoTable.finalY + 15,
-            head: [['Unique Sites', 'Unique IC', 'Unique FA', 'Escalations', 'Exceptions']],
-            body: [[d.sites, d.icSites, d.faSites, d.esc, d.exTotal]],
+            head: [['Unique Sites', 'IC Contractors', 'FA Contractors', 'Escalations', 'Exceptions']],
+            body: [[d.sites, d.icContractors, d.faContractors, d.esc, d.exTotal]],
             theme: 'grid',
             styles: {fontSize: 9, halign: 'center', fillColor: false},
             headStyles: {fillColor: false, textColor: [100, 100, 100]},
