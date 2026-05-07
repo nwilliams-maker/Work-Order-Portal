@@ -150,6 +150,8 @@
             <div class="col-xl-4">
                 <div class="row g-3 h-100">
                     <div class="col-12"><div class="kpi-card shadow-sm"><span class="pill-label">Unique Sites</span><div class="avg-pill" style="background:#f1f5f9; color:#64748b;" id="visitSplit">IC: 0 | FA: 0</div><div class="fw-800 fs-3 mt-1" id="uniqueVisits">0</div></div></div>
+                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#eff6ff;"><span class="pill-label" style="color:#2563eb;">Unique IC</span><div class="fw-800 fs-3 mt-1" style="color:#2563eb;" id="uniqueIC">0</div></div></div>
+                    <div class="col-6"><div class="kpi-card shadow-sm" style="background:#ecfdf5;"><span class="pill-label" style="color:#10b981;">Unique FA</span><div class="fw-800 fs-3 mt-1" style="color:#10b981;" id="uniqueFA">0</div></div></div>
                     <div class="col-6"><div class="kpi-card shadow-sm" style="background:#fffbeb;"><span class="pill-label text-warning">Escalations</span><div class="fw-800 fs-3 mt-1 text-warning" id="escCount">0</div></div></div>
                     <div class="col-6"><div class="kpi-card shadow-sm" style="background:#fff1f2;"><span class="pill-label text-danger">Exceptions</span><div class="fw-800 fs-3 text-danger mt-1" id="exceptionTotal">0</div></div></div>
                 </div>
@@ -412,6 +414,8 @@
         $("#totalIcPayments").text(`$${icPay.toLocaleString()}`);
         $("#uniqueVisits").text(globalLocs.size);
         $("#visitSplit").text(`IC: ${icLocs.size} | FA: ${faLocs.size}`);
+        $("#uniqueIC").text(icLocs.size);
+        $("#uniqueFA").text(faLocs.size);
         $("#escCount").text(escTotal);
         $("#icCostPerVisit").text(`$${(icLocs.size>0 ? Math.round(icPay/icLocs.size) : 0)}`);
         $("#faCostPerVisit").text(`$${(faLocs.size>0 ? Math.round(cte/faLocs.size) : 0)}`);
@@ -454,6 +458,7 @@
             cte: $("#mainCteDisplay").text(), cteDetails: "Fleet: $"+f.toLocaleString()+" | Payroll: $"+p.toLocaleString(),
             ic: $("#totalIcPayments").text(), icAvg: "Avg: "+$("#icCostPerVisit").text()+"/Site",
             sites: globalLocs.size.toString(), icFaSplit: "IC: "+icLocs.size+" | FA: "+faLocs.size,
+            icSites: icLocs.size.toString(), faSites: faLocs.size.toString(),
             esc: escTotal.toString(), exTotal: totalExCount.toString(),
             regular: pdfR, regSub: ["Regular Subtotal:", rS.toString(), "$"+rP.toLocaleString(), "$"+Math.round(rP/(rS||1)).toLocaleString()],
             escalation: pdfE, escSub: ["Escalations Subtotal:", eS.toString(), "$"+eP.toLocaleString(), "$"+Math.round(eP/(eS||1)).toLocaleString()],
@@ -757,16 +762,18 @@
         // 2. Operational KPI section
         doc.autoTable({
             startY: doc.lastAutoTable.finalY + 15,
-            head: [['Unique Sites', 'Escalations', 'Exceptions']],
-            body: [[d.sites, d.esc, d.exTotal], [d.icFaSplit, '', '']],
+            head: [['Unique Sites', 'Unique IC', 'Unique FA', 'Escalations', 'Exceptions']],
+            body: [[d.sites, d.icSites, d.faSites, d.esc, d.exTotal]],
             theme: 'grid',
             styles: {fontSize: 9, halign: 'center', fillColor: false},
             headStyles: {fillColor: false, textColor: [100, 100, 100]},
             didParseCell: function(data) {
                 if(data.row.index === 0) {
                     data.cell.styles.fontSize = 18; data.cell.styles.fontStyle = 'bold';
-                    if (data.column.index === 1) data.cell.styles.textColor = [245, 158, 11];
-                    if (data.column.index === 2) data.cell.styles.textColor = [225, 29, 72];
+                    if (data.column.index === 1) data.cell.styles.textColor = [37, 99, 235];   // IC blue
+                    if (data.column.index === 2) data.cell.styles.textColor = [16, 185, 129];  // FA green
+                    if (data.column.index === 3) data.cell.styles.textColor = [245, 158, 11];  // Esc amber
+                    if (data.column.index === 4) data.cell.styles.textColor = [225, 29, 72];   // Ex ruby
                 }
             }
         });
