@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { 
-            --bg: #f8fafc; --sidebar: #0f172a; --accent: #2563eb; 
+        :root {
+            --bg: #f8fafc; --sidebar: #0f172a; --accent: #2563eb;
             --danger: #e11d48; --warning: #f59e0b; --success: #10b981;
             --card-border: #e2e8f0; --text-main: #1e293b; --text-muted: #64748b;
         }
@@ -51,12 +51,33 @@
         .nav-link { border: none !important; color: var(--text-muted); font-weight: 700; cursor: pointer; padding: 10px 20px; }
         .nav-link.active { color: var(--accent); border-bottom: 3px solid var(--accent) !important; background: transparent !important; }
         .search-container { background: white; border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 2rem; display: flex; gap: 1rem; }
+        .task-type-card { background: white; border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; height: 100%; position: relative; transition: transform 0.15s ease; }
+        .task-type-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08); }
+        .task-type-card .tt-label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .task-type-card .tt-cost { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.04em; margin: 0.4rem 0 0.2rem; }
+        .task-type-card .tt-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--card-border); font-size: 0.75rem; }
+        .task-type-card .tt-meta .pill-label-drill { display: block; }
+        .tt-color-bar { height: 6px; border-radius: 6px; margin-top: 14px; background: #f1f5f9; overflow: hidden; }
+        .tt-color-bar > span { display: block; height: 100%; border-radius: 6px; }
+        .tt-newad { color: #2563eb; } .tt-newad-bg { background: #2563eb; }
+        .tt-default { color: #475569; } .tt-default-bg { background: #475569; }
+        .tt-kiosk { color: #10b981; } .tt-kiosk-bg { background: #10b981; }
+        .tt-escalation { color: #f59e0b; } .tt-escalation-bg { background: #f59e0b; }
+        .tt-continuity { color: #8b5cf6; } .tt-continuity-bg { background: #8b5cf6; }
+        .tt-section { background: white; border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .tt-section h6 { font-weight: 800; color: var(--text-main); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.06em; margin-bottom: 1rem; }
+        .tt-summary-table { width: 100%; font-size: 0.85rem; }
+        .tt-summary-table th { color: var(--text-muted); text-transform: uppercase; font-size: 0.65rem; font-weight: 800; padding: 10px 12px; border-bottom: 1px solid var(--card-border); }
+        .tt-summary-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-weight: 600; }
+        .tt-summary-table td.cost { font-weight: 800; }
+        .tt-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
     </style>
 </head>
 <body>
 <div class="sidebar">
     <h2 class="fw-800 mb-4">OpsCenter</h2>
     <label class="btn-upload">Upload Report <input type="file" id="csvFile" accept=".csv" hidden></label>
+    <button class="btn-upload" style="background:#0ea5e9;" onclick="openOnfleetModal()">🚚 Pull from OnFleet</button>
     <label class="btn-batch">📂 Batch Auto-Split <input type="file" id="batchCsvFile" accept=".csv" hidden></label>
     <button id="saveBtn" class="btn-save" onclick="persistCurrentReport()">💾 Save to Archive</button>
     <div class="sync-panel">
@@ -91,6 +112,7 @@
     <ul class="nav nav-tabs mb-4">
         <li class="nav-item"><a class="nav-link active" onclick="switchTab('command')" id="tab-dashboard">Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" onclick="switchTab('details')" id="tab-details">Dispatcher Detail</a></li>
+        <li class="nav-item"><a class="nav-link" onclick="switchTab('monthly')" id="tab-monthly">Monthly Report</a></li>
     </ul>
     <div id="view-command">
         <div class="row g-3 mb-4">
@@ -131,7 +153,86 @@
         </div>
         <div id="contractorList"></div>
     </div>
+    <div id="view-monthly" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-800 mb-1">Monthly Report — Cost Per Task Type</h4>
+                <p class="text-muted small mb-0">Breakdown of IC job pay by task type. Each card shows total cost, share of total, site count, and average pay per site.</p>
+            </div>
+            <div class="badge bg-light text-dark border px-3 py-2" style="border-radius: 8px;">
+                <span class="text-muted small">Period:</span>
+                <span class="fw-800 ms-1" id="monthlyPeriodLabel">--</span>
+            </div>
+        </div>
+        <div class="row g-3 mb-4" id="taskTypeCards"></div>
+        <div class="tt-section shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="m-0">Summary Breakdown</h6>
+                <div class="small text-muted">Total IC Pay: <span class="fw-800 text-dark" id="ttGrandTotal">$0</span> · <span id="ttGrandSites">0</span> sites</div>
+            </div>
+            <table class="tt-summary-table">
+                <thead>
+                    <tr>
+                        <th>Task Type</th>
+                        <th class="text-center">Sites</th>
+                        <th class="text-center">Jobs</th>
+                        <th class="text-end">Total Cost</th>
+                        <th class="text-end">Avg / Site</th>
+                        <th class="text-end">% of Total</th>
+                    </tr>
+                </thead>
+                <tbody id="ttSummaryBody"></tbody>
+            </table>
+        </div>
+        <div class="tt-section shadow-sm">
+            <h6>Top Sites by Task Type</h6>
+            <div id="ttTopSites" class="row g-3"></div>
+        </div>
+    </div>
 </div>
+<!-- OnFleet Pull Modal -->
+<div class="modal fade" id="onfleetModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 16px; border: 1px solid var(--card-border);">
+      <div class="modal-header" style="border-bottom: 1px solid var(--card-border);">
+        <h5 class="modal-title fw-800">🚚 Pull from OnFleet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-700 small text-muted text-uppercase">OnFleet API Key</label>
+          <input type="password" class="form-control" id="ofApiKey" autocomplete="off" placeholder="Paste your OnFleet API key">
+          <div class="form-check mt-2">
+            <input type="checkbox" class="form-check-input" id="ofRemember">
+            <label class="form-check-label small text-muted" for="ofRemember">Remember key in this browser (localStorage)</label>
+          </div>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label fw-700 small text-muted text-uppercase">From</label>
+            <input type="date" class="form-control" id="ofFrom">
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-700 small text-muted text-uppercase">To</label>
+            <input type="date" class="form-control" id="ofTo">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-700 small text-muted text-uppercase">FA Team Name</label>
+          <input type="text" class="form-control" id="ofFaTeam" value="Field Agents">
+          <div class="form-text small">Workers in this team are classified as FA. Everyone else is IC.</div>
+        </div>
+        <div id="ofStatus" class="small fw-700 text-muted" style="min-height: 1.5em;"></div>
+        <div id="ofError" class="alert alert-danger small mt-2" style="display:none;"></div>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid var(--card-border);">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary fw-700" id="ofPullBtn" onclick="ofImport()">Pull Tasks</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
@@ -139,12 +240,32 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script>
     let currentData = null, currentLabel = "";
+    // Task type categories displayed on Monthly Report tab
+    const TASK_TYPES = [
+        { key: 'new_ad',     label: 'New Ad',       cls: 'tt-newad',      bg: 'tt-newad-bg' },
+        { key: 'default',    label: 'Default',      cls: 'tt-default',    bg: 'tt-default-bg' },
+        { key: 'kiosk',      label: 'Kiosk Install',cls: 'tt-kiosk',      bg: 'tt-kiosk-bg' },
+        { key: 'escalation', label: 'Escalation',   cls: 'tt-escalation', bg: 'tt-escalation-bg' },
+        { key: 'continuity', label: 'Continuity',   cls: 'tt-continuity', bg: 'tt-continuity-bg' }
+    ];
+    function classifyTaskType(rawTaskType, ownerRaw, escFlag) {
+        const t = (rawTaskType || "").toLowerCase().trim();
+        const owner = (ownerRaw || "").toLowerCase();
+        const isEscFlag = (escFlag || "").toString().trim().toUpperCase() === "YES";
+        // Escalation overrides task type when explicitly flagged
+        if (isEscFlag || t.includes('escalation') || t.includes('escal') || owner.includes('matt shanks')) return 'escalation';
+        if (t.includes('new ad') || t.includes('new_ad') || t.includes('newad')) return 'new_ad';
+        if (t.includes('kiosk') || t.includes('install') || t.includes('rollout')) return 'kiosk';
+        if (t.includes('continuity') || t.includes('cont.')) return 'continuity';
+        // Default catches blanks, "default", "regular", and anything unclassified
+        return 'default';
+    }
     function getArchiveData() { try { let s = localStorage.getItem('opsArchive'); return s ? JSON.parse(LZString.decompressFromUTF16(s)) : {}; } catch(e) { return {}; } }
     function saveArchiveData(obj) { localStorage.setItem('opsArchive', LZString.compressToUTF16(JSON.stringify(obj))); }
-    $(document).ready(() => { 
+    $(document).ready(() => {
         loadFromStorage(); updateCalculations();
-        document.getElementById('importFile').addEventListener('change', e => { 
-            const r = new FileReader(); r.onload = ev => { try { const d = JSON.parse(ev.target.result); let arc = getArchiveData(); Object.assign(arc, d); saveArchiveData(arc); loadFromStorage(); } catch(err) { alert("Invalid import."); } }; r.readAsText(e.target.files[0]); 
+        document.getElementById('importFile').addEventListener('change', e => {
+            const r = new FileReader(); r.onload = ev => { try { const d = JSON.parse(ev.target.result); let arc = getArchiveData(); Object.assign(arc, d); saveArchiveData(arc); loadFromStorage(); } catch(err) { alert("Invalid import."); } }; r.readAsText(e.target.files[0]);
         });
     });
     function updateCalculations() { if (currentData) processData(currentData); else { const f = parseFloat($('#inputFleet').val())||0, p = parseFloat($('#inputPayroll').val())||0; $('#mainCteDisplay').text(`$${(f+p).toLocaleString()}`); } }
@@ -155,7 +276,7 @@
         if (clean.includes("Karen") || clean.includes("Yusep")) return "Karen Heiden";
         let people = clean.split(',').map(p => p.trim());
         if (people.length > 1) { const filtered = people.filter(p => !p.includes("Matt Shanks")); if (filtered.length > 0) people = filtered; }
-        return people[people.length - 1]; 
+        return people[people.length - 1];
     }
     function processData(data) {
         if (!data) return;
@@ -163,6 +284,9 @@
         let icPay = 0, escTotal = 0;
         const ownerMap = { regular: {}, escalations: {} }, globalLocs = new Set(), icLocs = new Set(), faLocs = new Set(), contractorMap = {};
         const exMap = { "Venue Closed": {}, "Kiosk Missing": {}, "Refusal": {}, "Damaged": {} };
+        // Task type accumulators (only counts IC rows since FA rows have no per-row rate)
+        const taskTypeMap = {};
+        TASK_TYPES.forEach(tt => { taskTypeMap[tt.key] = { pay: 0, sites: new Set(), jobs: 0, venues: {} }; });
 
         data.forEach(row => {
             const ownerRaw = row['Owner']||""; if (ownerRaw === 'Grand Total') return;
@@ -189,6 +313,18 @@
                     contractorMap[assigned].pay += rate; contractorMap[assigned].vids.add(vid);
                     if (!contractorMap[assigned].jobs[wo]) contractorMap[assigned].jobs[wo] = { rate: 0, stops: new Set() };
                     contractorMap[assigned].jobs[wo].rate += rate; contractorMap[assigned].jobs[wo].stops.add(vid);
+                }
+                // Bucket the row into a task-type category for the Monthly Report tab
+                const ttKey = classifyTaskType(row['task_type'], ownerRaw, row['Escalation']);
+                const bucket = taskTypeMap[ttKey];
+                if (bucket) {
+                    bucket.pay += rate;
+                    bucket.sites.add(vid);
+                    bucket.jobs += 1;
+                    const venueName = row['Venue Name'] || vid;
+                    if (!bucket.venues[venueName]) bucket.venues[venueName] = { pay: 0, sites: new Set() };
+                    bucket.venues[venueName].pay += rate;
+                    bucket.venues[venueName].sites.add(vid);
                 }
             }
             const status = (row['Exception Reason'] || "").toLowerCase();
@@ -240,23 +376,113 @@
         $("#ex-summary").html(exHtml);
         $("#exceptionTotal").text(totalExCount);
 
-        window.pdfExportData = { 
-            combined: $("#totalCombinedCost").text(), combinedAvg: "Avg: "+$("#trueAvgCost").text()+"/Site", 
-            cte: $("#mainCteDisplay").text(), cteDetails: "Fleet: $"+f.toLocaleString()+" | Payroll: $"+p.toLocaleString(), 
-            ic: $("#totalIcPayments").text(), icAvg: "Avg: "+$("#icCostPerVisit").text()+"/Site", 
-            sites: globalLocs.size.toString(), icFaSplit: "IC: "+icLocs.size+" | FA: "+faLocs.size, 
-            esc: escTotal.toString(), exTotal: totalExCount.toString(), 
-            regular: pdfR, regSub: ["Regular Subtotal:", rS.toString(), "$"+rP.toLocaleString(), "$"+Math.round(rP/(rS||1)).toLocaleString()], 
-            escalation: pdfE, escSub: ["Escalations Subtotal:", eS.toString(), "$"+eP.toLocaleString(), "$"+Math.round(eP/(eS||1)).toLocaleString()], 
-            grandTotal: ["GRAND TOTAL:", (rS+eS).toString(), "$"+(rP+eP).toLocaleString(), "$"+Math.round((rP+eP)/((rS+eS)||1)).toLocaleString()], 
-            exceptions: pdfExTableData 
+        // Render the Monthly Report tab content
+        renderTaskTypeReport(taskTypeMap, icPay);
+
+        window.pdfExportData = {
+            combined: $("#totalCombinedCost").text(), combinedAvg: "Avg: "+$("#trueAvgCost").text()+"/Site",
+            cte: $("#mainCteDisplay").text(), cteDetails: "Fleet: $"+f.toLocaleString()+" | Payroll: $"+p.toLocaleString(),
+            ic: $("#totalIcPayments").text(), icAvg: "Avg: "+$("#icCostPerVisit").text()+"/Site",
+            sites: globalLocs.size.toString(), icFaSplit: "IC: "+icLocs.size+" | FA: "+faLocs.size,
+            esc: escTotal.toString(), exTotal: totalExCount.toString(),
+            regular: pdfR, regSub: ["Regular Subtotal:", rS.toString(), "$"+rP.toLocaleString(), "$"+Math.round(rP/(rS||1)).toLocaleString()],
+            escalation: pdfE, escSub: ["Escalations Subtotal:", eS.toString(), "$"+eP.toLocaleString(), "$"+Math.round(eP/(eS||1)).toLocaleString()],
+            grandTotal: ["GRAND TOTAL:", (rS+eS).toString(), "$"+(rP+eP).toLocaleString(), "$"+Math.round((rP+eP)/((rS+eS)||1)).toLocaleString()],
+            exceptions: pdfExTableData,
+            taskTypes: TASK_TYPES.map(tt => {
+                const b = taskTypeMap[tt.key];
+                const sites = b.sites.size;
+                const avg = sites > 0 ? Math.round(b.pay / sites) : 0;
+                const pct = icPay > 0 ? ((b.pay / icPay) * 100).toFixed(1) : "0.0";
+                return [tt.label, sites.toString(), b.jobs.toString(), "$"+b.pay.toLocaleString(), "$"+avg.toLocaleString(), pct+"%"];
+            })
         };
-        
+
         let pillHtml = "";
         Object.entries(contractorMap).sort((a,b)=>b[1].pay-a[1].pay).forEach(([name, stats]) => {
             pillHtml += `<div class="contractor-pill contractor-item-wrapper" data-name="${name.toLowerCase()}" data-wos="${Object.keys(stats.jobs).join(' ').toLowerCase()}" data-pay="${stats.pay}" data-sites="${stats.vids.size}"><div class="contractor-header" onclick="$(this).next().slideToggle(150)"><div class="contractor-name">${name}</div><div class="pill-group-right shadow-sm"><div class="pill-stat"><span class="pill-label-drill">Sites</span><span class="pill-val">${stats.vids.size}</span></div><div class="pill-stat"><span class="pill-label-drill">Pay</span><span class="pill-val text-primary">$${stats.pay.toLocaleString()}</span></div><div class="pill-stat"><span class="pill-label-drill">Avg</span><span class="pill-val">$${Math.round(stats.pay/(stats.vids.size||1)).toLocaleString()}</span></div></div></div><div class="contractor-details"><table class="table detail-data-table mb-0 shadow-sm border"><thead><tr><th>Work Order #</th><th class="text-center"># of Stops</th><th class="text-end">Sum of Rate</th><th class="text-end">Avg / Stop</th></tr></thead><tbody>${Object.entries(stats.jobs).map(([wo, j])=>`<tr><td class="text-primary">${wo}</td><td class="text-center">${j.stops.size}</td><td class="text-end">$${j.rate.toLocaleString()}</td><td class="text-end fw-bold">$${Math.round(j.rate/(j.stops.size||1)).toLocaleString()}</td></tr>`).join('')}</tbody></table></div></div>`;
         });
         $("#contractorList").html(pillHtml);
+    }
+    function renderTaskTypeReport(taskTypeMap, icPay) {
+        $("#monthlyPeriodLabel").text(currentLabel || "—");
+        // Cards
+        let cardHtml = "";
+        let totalSites = 0;
+        TASK_TYPES.forEach(tt => {
+            const b = taskTypeMap[tt.key];
+            const sites = b.sites.size;
+            totalSites += sites;
+            const pct = icPay > 0 ? ((b.pay / icPay) * 100) : 0;
+            const avg = sites > 0 ? Math.round(b.pay / sites) : 0;
+            cardHtml += `
+                <div class="col-xl col-lg-4 col-md-6">
+                    <div class="task-type-card shadow-sm">
+                        <span class="tt-label ${tt.cls}">${tt.label}</span>
+                        <div class="tt-cost ${tt.cls}">$${b.pay.toLocaleString()}</div>
+                        <div class="text-muted small fw-700">${pct.toFixed(1)}% of IC pay</div>
+                        <div class="tt-meta">
+                            <div><span class="pill-label-drill">Sites</span><span class="pill-val">${sites}</span></div>
+                            <div><span class="pill-label-drill">Jobs</span><span class="pill-val">${b.jobs}</span></div>
+                            <div><span class="pill-label-drill">Avg / Site</span><span class="pill-val ${tt.cls}">$${avg.toLocaleString()}</span></div>
+                        </div>
+                        <div class="tt-color-bar"><span class="${tt.bg}" style="width:${Math.min(pct,100).toFixed(1)}%"></span></div>
+                    </div>
+                </div>`;
+        });
+        $("#taskTypeCards").html(cardHtml);
+
+        // Summary table
+        let rowHtml = "";
+        TASK_TYPES.forEach(tt => {
+            const b = taskTypeMap[tt.key];
+            const sites = b.sites.size;
+            const avg = sites > 0 ? Math.round(b.pay / sites) : 0;
+            const pct = icPay > 0 ? ((b.pay / icPay) * 100).toFixed(1) : "0.0";
+            rowHtml += `<tr>
+                <td><span class="tt-dot ${tt.bg}"></span><span class="fw-800 ${tt.cls}">${tt.label}</span></td>
+                <td class="text-center">${sites}</td>
+                <td class="text-center">${b.jobs}</td>
+                <td class="text-end cost ${tt.cls}">$${b.pay.toLocaleString()}</td>
+                <td class="text-end">$${avg.toLocaleString()}</td>
+                <td class="text-end fw-700">${pct}%</td>
+            </tr>`;
+        });
+        rowHtml += `<tr class="table-light fw-800">
+            <td>Total IC Pay</td>
+            <td class="text-center">${totalSites}</td>
+            <td class="text-center">—</td>
+            <td class="text-end">$${icPay.toLocaleString()}</td>
+            <td class="text-end">$${totalSites > 0 ? Math.round(icPay/totalSites).toLocaleString() : 0}</td>
+            <td class="text-end">100.0%</td>
+        </tr>`;
+        $("#ttSummaryBody").html(rowHtml);
+        $("#ttGrandTotal").text(`$${icPay.toLocaleString()}`);
+        $("#ttGrandSites").text(totalSites);
+
+        // Top sites per task type (top 5 by pay within each category)
+        let topHtml = "";
+        TASK_TYPES.forEach(tt => {
+            const b = taskTypeMap[tt.key];
+            const ranked = Object.entries(b.venues).sort((a,b)=>b[1].pay-a[1].pay).slice(0, 5);
+            topHtml += `
+                <div class="col-lg-6">
+                    <div class="border rounded p-3 h-100" style="background:#f8fafc;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div><span class="tt-dot ${tt.bg}"></span><span class="fw-800 ${tt.cls}">${tt.label}</span></div>
+                            <span class="text-muted small fw-700">${b.sites.size} sites · $${b.pay.toLocaleString()}</span>
+                        </div>
+                        ${ranked.length === 0 ? '<div class="text-muted small fst-italic">No data this period.</div>' :
+                            ranked.map(([v, info]) => `
+                                <div class="d-flex justify-content-between align-items-center py-1 border-bottom small">
+                                    <span class="text-truncate" style="max-width: 70%;" title="${v}">${v}</span>
+                                    <span class="fw-700">$${info.pay.toLocaleString()}</span>
+                                </div>`).join('')
+                        }
+                    </div>
+                </div>`;
+        });
+        $("#ttTopSites").html(topHtml);
     }
     function applyFiltersAndSort() {
         const term = $('#modernSearch').val().toLowerCase(), sort = $('#modernSort').val(), items = $('.contractor-item-wrapper').get();
@@ -292,47 +518,53 @@
     function loadArchivedReport(l, btn) { currentData = getArchiveData()[l]; currentLabel = l; processData(currentData); $('.history-badge').removeClass('active-badge'); $(btn).addClass('active-badge'); $('#saveBtn').hide(); $('#pdfBtn, #datePill').show(); $('#periodValueText').text(l); }
     function persistCurrentReport() { let arc = getArchiveData(); arc[currentLabel] = currentData; saveArchiveData(arc); loadFromStorage(); $('#saveBtn').hide(); }
     function checkSelectionState() { $('#selectionPanel').toggle($('.merge-checkbox:checked').length > 0); }
-    function switchTab(t) { $('.nav-link').removeClass('active'); if(t==='command') { $('#view-command').show(); $('#view-details').hide(); $('#tab-dashboard').addClass('active'); } else { $('#view-command').hide(); $('#view-details').show(); $('#tab-details').addClass('active'); } }
-    
+    function switchTab(t) {
+        $('.nav-link').removeClass('active');
+        $('#view-command, #view-details, #view-monthly').hide();
+        if (t === 'command') { $('#view-command').show(); $('#tab-dashboard').addClass('active'); }
+        else if (t === 'details') { $('#view-details').show(); $('#tab-details').addClass('active'); }
+        else if (t === 'monthly') { $('#view-monthly').show(); $('#tab-monthly').addClass('active'); }
+    }
+
     // FINAL PDF ENGINE MATCHING IMAGE COLOR CODING
     function downloadNativePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'pt', 'letter'); const d = window.pdfExportData;
-        doc.setFontSize(22); doc.setTextColor(15,23,42); doc.setFont("helvetica", "bold"); doc.text("OpsCenter Financial Overview", 40, 50); 
+        doc.setFontSize(22); doc.setTextColor(15,23,42); doc.setFont("helvetica", "bold"); doc.text("OpsCenter Financial Overview", 40, 50);
         doc.setFontSize(12); doc.setTextColor(100); doc.setFont("helvetica", "normal"); doc.text(currentLabel, 40, 70);
-        
+
         // 1. FINANCIAL KPI SECTION (Removed Fill)
-        doc.autoTable({ 
-            startY: 90, 
-            head: [['Total Combined Cost', 'Fixed CTE Total', 'IC Job Pay']], 
-            body: [[d.combined, d.cte, d.ic], [d.combinedAvg, d.cteDetails, d.icAvg]], 
-            theme: 'grid', 
+        doc.autoTable({
+            startY: 90,
+            head: [['Total Combined Cost', 'Fixed CTE Total', 'IC Job Pay']],
+            body: [[d.combined, d.cte, d.ic], [d.combinedAvg, d.cteDetails, d.icAvg]],
+            theme: 'grid',
             styles: {fontSize: 9, halign: 'center', fillColor: false}, // No fill
             headStyles: {fillColor: false, textColor: [100, 100, 100]}, // Subtle text
-            didParseCell: function(data) { 
-                if(data.row.index === 0) { 
+            didParseCell: function(data) {
+                if(data.row.index === 0) {
                     data.cell.styles.fontSize = 18; data.cell.styles.fontStyle = 'bold';
                     data.cell.styles.textColor = [37, 99, 235]; // Royal Blue
                 } else if (data.row.index === 1 && (data.column.index === 0 || data.column.index === 2)) {
                     data.cell.styles.textColor = [16, 185, 129]; // Vibrant Green
                 }
-            } 
+            }
         });
 
         // 2. OPERATIONAL KPI SECTION (Removed Fill)
-        doc.autoTable({ 
-            startY: doc.lastAutoTable.finalY + 15, 
-            head: [['Unique Sites', 'Escalations', 'Exceptions']], 
-            body: [[d.sites, d.esc, d.exTotal], [d.icFaSplit, '', '']], 
-            theme: 'grid', 
-            styles: {fontSize: 9, halign: 'center', fillColor: false}, 
+        doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 15,
+            head: [['Unique Sites', 'Escalations', 'Exceptions']],
+            body: [[d.sites, d.esc, d.exTotal], [d.icFaSplit, '', '']],
+            theme: 'grid',
+            styles: {fontSize: 9, halign: 'center', fillColor: false},
             headStyles: {fillColor: false, textColor: [100, 100, 100]},
-            didParseCell: function(data) { 
-                if(data.row.index === 0) { 
+            didParseCell: function(data) {
+                if(data.row.index === 0) {
                     data.cell.styles.fontSize = 18; data.cell.styles.fontStyle = 'bold';
                     if (data.column.index === 1) data.cell.styles.textColor = [245, 158, 11]; // Amber
                     if (data.column.index === 2) data.cell.styles.textColor = [225, 29, 72]; // Ruby Red
-                } 
-            } 
+                }
+            }
         });
 
         // 3. DISPATCHER & EXCEPTION TABLES
@@ -345,31 +577,49 @@
         dispatcherBody.push([{content: "Escalations Subtotal:", styles: {halign:'right', fontStyle: 'bold'}}, "", {content: d.escSub[2], styles: {fontStyle: 'bold', textColor: [37,99,235]}}, d.escSub[3]]);
         dispatcherBody.push([{content: d.grandTotal[0], styles: {fillColor: [226, 232, 240], fontStyle: 'bold', halign:'right'}}, d.grandTotal[1], {content: d.grandTotal[2], styles: {fontStyle: 'bold', textColor:[37,99,235]}}, d.grandTotal[3]]);
 
-        doc.autoTable({ 
-            startY: doc.lastAutoTable.finalY + 30, 
-            margin: {right: 230}, 
-            head: [['Dispatcher', 'Sites', 'Total Pay', 'Avg / Site']], 
-            body: dispatcherBody, 
-            theme: 'grid', 
+        doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 30,
+            margin: {right: 230},
+            head: [['Dispatcher', 'Sites', 'Total Pay', 'Avg / Site']],
+            body: dispatcherBody,
+            theme: 'grid',
             styles: {fontSize: 8},
             headStyles: {fillColor: [15, 23, 42]} // Slate header
         });
 
-        doc.autoTable({ 
-            startY: doc.lastAutoTable.finalY - (dispatcherBody.length * 12.5) - 22, 
-            margin: {left: 410}, 
-            head: [['Venue Name', 'Count']], 
-            body: d.exceptions, 
-            theme: 'grid', 
+        doc.autoTable({
+            startY: doc.lastAutoTable.finalY - (dispatcherBody.length * 12.5) - 22,
+            margin: {left: 410},
+            head: [['Venue Name', 'Count']],
+            body: d.exceptions,
+            theme: 'grid',
             styles: {fontSize: 8},
             headStyles: {fillColor: [225, 29, 72]}, // Ruby header
             columnStyles: { 1: {textColor: [225, 29, 72], fontStyle: 'bold', halign: 'center'} } // Ruby red count values
         });
 
+        // 4. MONTHLY REPORT — COST PER TASK TYPE
+        if (d.taskTypes && d.taskTypes.length) {
+            doc.addPage();
+            doc.setFontSize(18); doc.setTextColor(15,23,42); doc.setFont("helvetica", "bold");
+            doc.text("Monthly Report — Cost Per Task Type", 40, 50);
+            doc.setFontSize(11); doc.setTextColor(100); doc.setFont("helvetica", "normal");
+            doc.text(currentLabel, 40, 68);
+            doc.autoTable({
+                startY: 90,
+                head: [['Task Type', 'Sites', 'Jobs', 'Total Cost', 'Avg / Site', '% of IC Pay']],
+                body: d.taskTypes,
+                theme: 'grid',
+                styles: { fontSize: 10 },
+                headStyles: { fillColor: [15, 23, 42] },
+                columnStyles: { 3: { fontStyle: 'bold', textColor: [37, 99, 235] } }
+            });
+        }
+
         doc.save(`OpsCenter_Overview_${currentLabel.replace(/\s/g, '_')}.pdf`);
     }
     document.getElementById('csvFile').addEventListener('change', e => { Papa.parse(e.target.files[0], { header: true, complete: r => { currentData = r.data; currentLabel = e.target.files[0].name.replace('.csv',''); processData(r.data); $('#saveBtn, #pdfBtn, #datePill').show(); $('#periodValueText').text(currentLabel); }}); });
-    document.getElementById('batchCsvFile').addEventListener('change', e => { 
+    document.getElementById('batchCsvFile').addEventListener('change', e => {
         Papa.parse(e.target.files[0], { header: true, complete: r => {
             let arc = getArchiveData(); r.data.forEach(row => {
                 let d = parseDateSafe(row['Date Visited']||row['Visit Date']); if(!d) return;
@@ -377,9 +627,164 @@
                 let l = `${s.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${ed.toLocaleDateString(undefined, {month:'short', day:'numeric'})}, ${ed.getFullYear()}`;
                 if(!arc[l]) arc[l] = []; arc[l].push(row);
             }); saveArchiveData(arc); loadFromStorage(); alert("Batch complete.");
-        }}); 
+        }});
     });
     function exportArchive() { const arc = getArchiveData(); if (Object.keys(arc).length === 0) return; const blob = new Blob([JSON.stringify(arc)], {type: "application/json"}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `OpsCenter_Archive_${new Date().toISOString().split('T')[0]}.json`; a.click(); }
+
+    // ===========================================================
+    // OnFleet direct pull (browser -> OnFleet API)
+    // ===========================================================
+    const ONFLEET_BASE = 'https://onfleet.com/api/v2';
+    // Metadata field name lookups — same idea as the Python script.
+    // Edit these once you know what your OnFleet metadata fields are named.
+    const OF_META = {
+        task_type: ['taskType', 'task_type', 'Task Type'],
+        rate:      ['rate', 'Rate', 'SUM of Rate', 'sum_of_rate', 'pay'],
+        escalation:['escalation', 'Escalation', 'isEscalation'],
+        wo:        ['workOrderNumber', 'WO #', 'wo_number', 'workOrder', 'WO'],
+        venue:     ['venueName', 'Venue Name', 'venue'],
+        vid:       ['VID', 'vid', 'venueId', 'Venue ID'],
+        exception: ['exceptionReason', 'Exception Reason', 'failureReason'],
+        owner:     ['owner', 'Owner', 'dispatcher', 'Dispatcher']
+    };
+    function ofGetSaved() { try { return JSON.parse(localStorage.getItem('onfleetCreds') || '{}'); } catch(e) { return {}; } }
+    function ofSetSaved(o) { localStorage.setItem('onfleetCreds', JSON.stringify(o)); }
+    function openOnfleetModal() {
+        const saved = ofGetSaved();
+        if (saved.key) { $('#ofApiKey').val(saved.key); $('#ofRemember').prop('checked', true); }
+        if (saved.faTeam) $('#ofFaTeam').val(saved.faTeam);
+        // Default the date range to last Mon-Sun
+        const today = new Date();
+        const last = new Date(today); last.setDate(today.getDate() - ((today.getDay() + 6) % 7) - 7);
+        const end  = new Date(last);  end.setDate(last.getDate() + 6);
+        $('#ofFrom').val(last.toISOString().slice(0,10));
+        $('#ofTo').val(end.toISOString().slice(0,10));
+        $('#ofStatus').text(''); $('#ofError').hide().text('');
+        new bootstrap.Modal(document.getElementById('onfleetModal')).show();
+    }
+    async function ofFetch(path, params, key) {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+        const auth = btoa(key + ':');
+        const r = await fetch(ONFLEET_BASE + path + qs, {
+            method: 'GET',
+            headers: { 'Authorization': 'Basic ' + auth, 'Accept': 'application/json' }
+        });
+        if (!r.ok) {
+            const txt = await r.text().catch(()=>'');
+            throw new Error(`OnFleet ${r.status}: ${txt.slice(0,200)}`);
+        }
+        return r.json();
+    }
+    async function ofPullTasks(key, fromMs, toMs, statusEl) {
+        const tasks = []; let lastId = null, page = 0;
+        while (true) {
+            const params = { from: fromMs, to: toMs };
+            if (lastId) params.lastId = lastId;
+            statusEl.text(`Fetching tasks... page ${++page}, ${tasks.length} so far`);
+            const data = await ofFetch('/tasks/all', params, key);
+            const chunk = data.tasks || [];
+            tasks.push(...chunk);
+            lastId = data.lastId;
+            if (!lastId || !chunk.length) break;
+            if (page > 200) break; // safety guard
+        }
+        return tasks;
+    }
+    function ofMeta(meta, names) {
+        if (!meta) return '';
+        const map = {};
+        meta.forEach(m => { if (m && m.name) map[String(m.name).toLowerCase()] = m.value; });
+        for (const n of names) {
+            const v = map[n.toLowerCase()];
+            if (v != null && v !== '') return v;
+        }
+        return '';
+    }
+    function ofTransformTask(t, faIds, workerMap, includeIncomplete) {
+        const completed = !!t.completed || t.state === 3;
+        if (!completed && !includeIncomplete) return null;
+        const md = t.metadata || [];
+        const wid = t.worker || '';
+        const w = workerMap[wid] || {};
+        const tech = w.name || '';
+        const icFa = wid && faIds.has(wid) ? 'FA' : 'IC';
+        const escRaw = String(ofMeta(md, OF_META.escalation) || '').toLowerCase();
+        const escalation = ['yes','true','1','y'].includes(escRaw) ? 'YES' : '';
+        const dest = t.destination || {};
+        const addrObj = dest.address || {};
+        const addr = addrObj.unparsed || [addrObj.number, addrObj.street, addrObj.city, addrObj.state].filter(Boolean).join(' ');
+        const visitMs = t.completedAt || t.completeAfter || t.createdAt;
+        const visit = visitMs ? new Date(visitMs).toLocaleDateString('en-US') : '';
+        const cd = t.completionDetails || {};
+        return {
+            'Date Visited':       visit,
+            'Owner':              ofMeta(md, OF_META.owner) || '',
+            'Assigned to':        tech,
+            'IC/FA':              icFa,
+            'task_type':          ofMeta(md, OF_META.task_type) || '',
+            'Escalation':         escalation,
+            'SUM of Rate':        ofMeta(md, OF_META.rate) || '',
+            'Work Order Number':  ofMeta(md, OF_META.wo) || t.shortId || '',
+            'VID':                ofMeta(md, OF_META.vid) || '',
+            'Address':            addr,
+            'Venue Name':         ofMeta(md, OF_META.venue) || dest.name || '',
+            'Exception Reason':   ofMeta(md, OF_META.exception) || cd.failureReason || ''
+        };
+    }
+    async function ofImport() {
+        const key     = $('#ofApiKey').val().trim();
+        const fromStr = $('#ofFrom').val();
+        const toStr   = $('#ofTo').val();
+        const faTeam  = ($('#ofFaTeam').val() || 'Field Agents').trim();
+        $('#ofError').hide().text(''); $('#ofStatus').text('');
+        if (!key)               { $('#ofError').text('API key is required.').show(); return; }
+        if (!fromStr || !toStr) { $('#ofError').text('Pick a from/to date range.').show(); return; }
+
+        // Persist preferences
+        ofSetSaved({ key: $('#ofRemember').is(':checked') ? key : null, faTeam });
+
+        const fromMs = new Date(fromStr + 'T00:00:00Z').getTime();
+        const toMs   = new Date(toStr   + 'T23:59:59Z').getTime();
+
+        const $btn = $('#ofPullBtn'), $st = $('#ofStatus');
+        $btn.prop('disabled', true).text('Working...');
+        try {
+            $st.text('Fetching teams...');
+            const teams = await ofFetch('/teams', null, key);
+            const team = (teams || []).find(t => String(t.name||'').toLowerCase() === faTeam.toLowerCase());
+            const faIds = new Set(team ? (team.workers || []) : []);
+            if (!team) $st.text(`Note: team "${faTeam}" not found — all workers will be IC. Fetching workers...`);
+
+            $st.text((team ? `FA team has ${faIds.size} workers. ` : '') + 'Fetching workers...');
+            const workers = await ofFetch('/workers', null, key);
+            const workerMap = {};
+            (workers || []).forEach(w => { workerMap[w.id] = w; });
+
+            const tasks = await ofPullTasks(key, fromMs, toMs, $st);
+
+            $st.text(`Transforming ${tasks.length} tasks...`);
+            const rows = tasks.map(t => ofTransformTask(t, faIds, workerMap, false)).filter(Boolean);
+
+            currentData = rows;
+            currentLabel = `${fromStr} to ${toStr}`;
+            processData(rows);
+            $('#saveBtn, #pdfBtn, #datePill').show();
+            $('#periodValueText').text(currentLabel);
+
+            $st.text(`Done — ${rows.length} rows loaded into the dashboard.`);
+            setTimeout(() => bootstrap.Modal.getInstance(document.getElementById('onfleetModal')).hide(), 600);
+        } catch (err) {
+            console.error(err);
+            const msg = (err && err.message) || String(err);
+            const corsHint = msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')
+                ? '\n\nThis often means OnFleet blocked the browser request (CORS). The fix is a tiny proxy or running the Python script.'
+                : '';
+            $('#ofError').text(msg + corsHint).show();
+            $st.text('');
+        } finally {
+            $btn.prop('disabled', false).text('Pull Tasks');
+        }
+    }
 </script>
 </body>
 </html>
