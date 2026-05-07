@@ -276,7 +276,7 @@
         if (isEscFlag || t.includes('escalation') || t.includes('escal') || owner.includes('matt shanks')) return 'escalation';
         if (t.includes('new ad') || t.includes('new_ad') || t.includes('newad')) return 'new_ad';
         if (t.includes('kiosk') || t.includes('install') || t.includes('rollout')) return 'kiosk';
-        if (t.includes('continuity') || t.includes('cont.')) return 'continuity';
+        if (t.includes('continuity') || t.includes('cont.') || t.includes('digital service')) return 'continuity';
         // Default catches blanks, "default", "regular", and anything unclassified
         return 'default';
     }
@@ -334,7 +334,8 @@
                     if (!contractorMap[assigned].jobs[wo]) contractorMap[assigned].jobs[wo] = { rate: 0, stops: new Set() };
                     contractorMap[assigned].jobs[wo].rate += rate; contractorMap[assigned].jobs[wo].stops.add(vid);
                 }
-                // Bucket the row into a task-type category for the Monthly Report tab
+                // Bucket the row into a task-type category for the Monthly Report tab.
+                // Digital Service rolls up into Continuity (see classifyTaskType).
                 const ttKey = classifyTaskType(row['task_type'], ownerRaw, row['Escalation']);
                 const bucket = taskTypeMap[ttKey];
                 if (bucket) {
@@ -657,7 +658,7 @@
     // ⬇️  PASTE YOUR ONFLEET API KEY BETWEEN THE QUOTES BELOW (one-time setup) ⬇️
     // Find it in OnFleet -> Settings -> API & Webhooks -> API Keys.
     // Anyone who opens this HTML file can read this key, so don't share the file.
-    const ONFLEET_API_KEY = "33033b2d35d6428c485758c8a67bb7c0";
+    const ONFLEET_API_KEY = "PASTE_YOUR_ONFLEET_API_KEY_HERE";
     const ONFLEET_BASE = 'https://onfleet.com/api/v2';
     // Metadata field name lookups — same idea as the Python script.
     // Edit these once you know what your OnFleet metadata fields are named.
