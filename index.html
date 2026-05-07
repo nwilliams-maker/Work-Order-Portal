@@ -625,9 +625,11 @@
 
         // Summary table
         let rowHtml = "";
+        let totalJobs = 0;
         TASK_TYPES.forEach(tt => {
             const b = taskTypeMap[tt.key];
             const sites = b.sites.size;
+            totalJobs += b.jobs;
             const avg = sites > 0 ? Math.round(b.pay / sites) : 0;
             const pct = icPay > 0 ? ((b.pay / icPay) * 100).toFixed(1) : "0.0";
             rowHtml += `<tr>
@@ -642,7 +644,7 @@
         rowHtml += `<tr class="table-light fw-800">
             <td>Total IC Pay</td>
             <td class="text-center">${totalSites}</td>
-            <td class="text-center">—</td>
+            <td class="text-center">${totalJobs.toLocaleString()}</td>
             <td class="text-end">$${icPay.toLocaleString()}</td>
             <td class="text-end">$${totalSites > 0 ? Math.round(icPay/totalSites).toLocaleString() : 0}</td>
             <td class="text-end">100.0%</td>
