@@ -66,6 +66,18 @@
         .tt-continuity { color: #8b5cf6; } .tt-continuity-bg { background: #8b5cf6; }
         .tt-section { background: white; border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .tt-section h6 { font-weight: 800; color: var(--text-main); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.06em; margin-bottom: 1rem; }
+        .ofInspectBody { max-height: 320px; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 10px; background: #f8fafc; padding: 10px; font-size: 0.78rem; }
+        .ofInspectBody table { width: 100%; }
+        .ofInspectBody th { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); padding: 6px 8px; border-bottom: 1px solid var(--card-border); font-weight: 800; }
+        .ofInspectBody td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        .ofInspectBody td.col { font-weight: 800; color: var(--text-main); white-space: nowrap; }
+        .ofInspectBody td.src { color: var(--text-muted); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.72rem; }
+        .ofInspectBody td.val { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.72rem; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+        .ofInspectBody .status-ok { color: var(--success); font-weight: 800; }
+        .ofInspectBody .status-blank { color: var(--danger); font-weight: 800; }
+        .ofInspectBody .status-fallback { color: var(--warning); font-weight: 800; }
+        .ofInspectBody pre { margin: 0; font-size: 0.7rem; white-space: pre-wrap; word-break: break-word; }
+        #ofInspectTabs .nav-link { padding: 4px 10px; cursor: pointer; }
         .tt-summary-table { width: 100%; font-size: 0.85rem; }
         .tt-summary-table th { color: var(--text-muted); text-transform: uppercase; font-size: 0.65rem; font-weight: 800; padding: 10px 12px; border-bottom: 1px solid var(--card-border); }
         .tt-summary-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-weight: 600; }
@@ -221,8 +233,19 @@
         </div>
         <div id="ofStatus" class="small fw-700 text-muted" style="min-height: 1.5em;"></div>
         <div id="ofError" class="alert alert-danger small mt-2" style="display:none;"></div>
+        <div id="ofInspectPanel" style="display:none;" class="mt-3">
+          <ul class="nav nav-pills small mb-2" id="ofInspectTabs">
+            <li class="nav-item"><a class="nav-link active fw-700" data-tab="map" href="#">Column Mapping</a></li>
+            <li class="nav-item"><a class="nav-link fw-700" data-tab="meta" href="#">Metadata Found</a></li>
+            <li class="nav-item"><a class="nav-link fw-700" data-tab="raw" href="#">Raw Sample</a></li>
+          </ul>
+          <div id="ofInspectMap" class="ofInspectBody"></div>
+          <div id="ofInspectMeta" class="ofInspectBody" style="display:none;"></div>
+          <div id="ofInspectRaw" class="ofInspectBody" style="display:none;"></div>
+        </div>
       </div>
       <div class="modal-footer" style="border-top: 1px solid var(--card-border);">
+        <button type="button" class="btn btn-light me-auto" id="ofInspectBtn" onclick="ofInspectSample()">🔍 Inspect Sample</button>
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary fw-700" id="ofPullBtn" onclick="ofImport()">Pull Tasks</button>
       </div>
@@ -791,6 +814,176 @@
             $btn.prop('disabled', false).text('Pull Tasks');
         }
     }
+
+    // -----------------------------------------------------------
+    // OnFleet Field Inspector — verifies the column mapping
+    // -----------------------------------------------------------
+    // Defines what each dashboard column expects, where it pulls from in
+    // OnFleet, and provides a getter that returns {value, usedFallback}.
+    const OF_COLUMN_MAP = [
+        { col: 'Date Visited',       src: 'task.completedAt | task.completeAfter | task.createdAt',
+          get: t => { const ms = t.completedAt || t.completeAfter || t.createdAt;
+                      return { value: ms ? new Date(ms).toLocaleDateString('en-US') : '', usedFallback: !t.completedAt && !!ms }; } },
+        { col: 'Owner',              src: 'metadata: ' + OF_META.owner.join(', '),
+          get: t => ({ value: ofMeta(t.metadata, OF_META.owner) || '', usedFallback: false }) },
+        { col: 'Assigned to',        src: 'task.worker -> workers[id].name',
+          get: (t, ctx) => ({ value: (ctx.workerMap[t.worker] || {}).name || '', usedFallback: false }) },
+        { col: 'IC/FA',              src: 'FA team membership of task.worker',
+          get: (t, ctx) => ({ value: t.worker && ctx.faIds.has(t.worker) ? 'FA' : 'IC', usedFallback: false }) },
+        { col: 'task_type',          src: 'metadata: ' + OF_META.task_type.join(', '),
+          get: t => ({ value: ofMeta(t.metadata, OF_META.task_type) || '', usedFallback: false }) },
+        { col: 'Escalation',         src: 'metadata: ' + OF_META.escalation.join(', '),
+          get: t => ({ value: ofMeta(t.metadata, OF_META.escalation) || '', usedFallback: false }) },
+        { col: 'SUM of Rate',        src: 'metadata: ' + OF_META.rate.join(', '),
+          get: t => ({ value: ofMeta(t.metadata, OF_META.rate) || '', usedFallback: false }) },
+        { col: 'Work Order Number',  src: 'metadata (' + OF_META.wo.join(', ') + ') -> task.shortId',
+          get: t => { const m = ofMeta(t.metadata, OF_META.wo);
+                      return { value: m || t.shortId || '', usedFallback: !m && !!t.shortId }; } },
+        { col: 'VID',                src: 'metadata: ' + OF_META.vid.join(', '),
+          get: t => ({ value: ofMeta(t.metadata, OF_META.vid) || '', usedFallback: false }) },
+        { col: 'Address',            src: 'task.destination.address.unparsed',
+          get: t => { const a = (t.destination && t.destination.address) || {};
+                      const v = a.unparsed || [a.number, a.street, a.city, a.state].filter(Boolean).join(' ');
+                      return { value: v, usedFallback: !a.unparsed && !!v }; } },
+        { col: 'Venue Name',         src: 'metadata (' + OF_META.venue.join(', ') + ') -> task.destination.name',
+          get: t => { const m = ofMeta(t.metadata, OF_META.venue);
+                      const fb = (t.destination || {}).name || '';
+                      return { value: m || fb, usedFallback: !m && !!fb }; } },
+        { col: 'Exception Reason',   src: 'metadata (' + OF_META.exception.join(', ') + ') -> task.completionDetails.failureReason',
+          get: t => { const m = ofMeta(t.metadata, OF_META.exception);
+                      const fb = (t.completionDetails || {}).failureReason || '';
+                      return { value: m || fb, usedFallback: !m && !!fb }; } },
+    ];
+
+    // Returns the first non-empty value across `samples` for the given column getter.
+    function ofFirstSample(samples, ctx, getter) {
+        for (const t of samples) {
+            const r = getter(t, ctx);
+            if (r.value !== '' && r.value != null) return r;
+        }
+        return { value: '', usedFallback: false };
+    }
+
+    // Render the column mapping table, the discovered metadata table, and a raw JSON sample.
+    function ofRenderInspect(samples, ctx) {
+        // 1. Mapping table — one row per dashboard column
+        const allMapped = new Set(Object.values(OF_META).flat().map(s => s.toLowerCase()));
+        let mapHtml = `<table><thead><tr>
+            <th>Dashboard Column</th><th>OnFleet Source</th><th>Sample Value</th><th>Status</th>
+        </tr></thead><tbody>`;
+        let okCount = 0, blankCount = 0, fbCount = 0;
+        OF_COLUMN_MAP.forEach(m => {
+            const r = ofFirstSample(samples, ctx, m.get);
+            const v = String(r.value == null ? '' : r.value);
+            let badge, cls;
+            if (v === '')                { badge = 'BLANK';    cls = 'status-blank'; blankCount++; }
+            else if (r.usedFallback)     { badge = 'FALLBACK'; cls = 'status-fallback'; fbCount++; }
+            else                         { badge = 'OK';       cls = 'status-ok'; okCount++; }
+            mapHtml += `<tr>
+                <td class="col">${m.col}</td>
+                <td class="src">${m.src}</td>
+                <td class="val" title="${$('<div>').text(v).html()}">${$('<div>').text(v.slice(0,80)).html() || '<span class="text-muted">—</span>'}</td>
+                <td class="${cls}">${badge}</td>
+            </tr>`;
+        });
+        mapHtml += `</tbody></table>
+            <div class="d-flex justify-content-between mt-2 small text-muted">
+                <span>Sampled ${samples.length} task(s) from your date range.</span>
+                <span><span class="status-ok">${okCount} OK</span> · <span class="status-fallback">${fbCount} fallback</span> · <span class="status-blank">${blankCount} blank</span></span>
+            </div>`;
+        $('#ofInspectMap').html(mapHtml);
+
+        // 2. Metadata field discovery — every metadata name found in the sample,
+        //    flagged as MAPPED (already in OF_META) or UNMAPPED (we currently ignore it)
+        const seen = {};
+        samples.forEach(t => (t.metadata || []).forEach(m => {
+            if (!m || !m.name) return;
+            const key = String(m.name);
+            if (!seen[key]) seen[key] = { count: 0, sample: '' };
+            seen[key].count++;
+            if (!seen[key].sample && m.value != null && m.value !== '') {
+                seen[key].sample = String(m.value).slice(0, 80);
+            }
+        }));
+        const metaRows = Object.entries(seen).sort((a,b)=>b[1].count - a[1].count);
+        let metaHtml;
+        if (!metaRows.length) {
+            metaHtml = '<div class="text-muted fst-italic small">No metadata fields found on these tasks. Either none of your tasks carry metadata, or your fields use a different storage path.</div>';
+        } else {
+            metaHtml = `<div class="small text-muted mb-2">Every metadata <code>name</code> found in the sample. <b>UNMAPPED</b> fields aren't currently being read into the dashboard — if one of these is what you want for a column, add the exact name to <code>OF_META</code> in this file.</div>
+                <table><thead><tr><th>Metadata Name</th><th>Count</th><th>Sample Value</th><th>Status</th></tr></thead><tbody>`;
+            metaRows.forEach(([name, info]) => {
+                const mapped = allMapped.has(name.toLowerCase());
+                metaHtml += `<tr>
+                    <td class="col">${$('<div>').text(name).html()}</td>
+                    <td>${info.count}</td>
+                    <td class="val">${$('<div>').text(info.sample).html() || '<span class="text-muted">—</span>'}</td>
+                    <td class="${mapped ? 'status-ok' : 'status-fallback'}">${mapped ? 'MAPPED' : 'UNMAPPED'}</td>
+                </tr>`;
+            });
+            metaHtml += '</tbody></table>';
+        }
+        $('#ofInspectMeta').html(metaHtml);
+
+        // 3. Raw JSON of the first sample — for manual eyeballing
+        const raw = samples[0] ? JSON.stringify(samples[0], null, 2) : '(no tasks in this range)';
+        $('#ofInspectRaw').html(`<div class="small text-muted mb-2">Full JSON of the first task in the sample:</div><pre>${$('<div>').text(raw).html()}</pre>`);
+    }
+
+    async function ofInspectSample() {
+        const fromStr = $('#ofFrom').val();
+        const toStr   = $('#ofTo').val();
+        const faTeam  = ($('#ofFaTeam').val() || 'Field Agents').trim();
+        $('#ofError').hide().text(''); $('#ofStatus').text(''); $('#ofInspectPanel').hide();
+        if (!ofKeyConfigured()) { $('#ofError').text('OnFleet API key constant is not set. Edit ONFLEET_API_KEY in this HTML file.').show(); return; }
+        if (!fromStr || !toStr) { $('#ofError').text('Pick a from/to date range.').show(); return; }
+
+        const fromMs = new Date(fromStr + 'T00:00:00Z').getTime();
+        const toMs   = new Date(toStr   + 'T23:59:59Z').getTime();
+        const $btn = $('#ofInspectBtn'), $st = $('#ofStatus');
+        $btn.prop('disabled', true).text('Working...');
+        try {
+            $st.text('Fetching teams + workers...');
+            const teams = await ofFetch('/teams', null, ONFLEET_API_KEY);
+            const team = (teams || []).find(t => String(t.name||'').toLowerCase() === faTeam.toLowerCase());
+            const faIds = new Set(team ? (team.workers || []) : []);
+            const workers = await ofFetch('/workers', null, ONFLEET_API_KEY);
+            const workerMap = {}; (workers || []).forEach(w => { workerMap[w.id] = w; });
+
+            $st.text('Fetching first page of tasks...');
+            const data = await ofFetch('/tasks/all', { from: fromMs, to: toMs }, ONFLEET_API_KEY);
+            const samples = (data.tasks || []).slice(0, 10);
+            if (!samples.length) {
+                $('#ofError').text('No tasks returned for that date range. Try widening the dates.').show();
+                $st.text('');
+                return;
+            }
+            ofRenderInspect(samples, { faIds, workerMap });
+            $('#ofInspectPanel').show();
+            $st.text(`Inspected ${samples.length} sample task(s). Review the tabs below.`);
+        } catch (err) {
+            console.error(err);
+            const msg = (err && err.message) || String(err);
+            const corsHint = msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')
+                ? '\n\nThis often means OnFleet blocked the browser request (CORS). The fix is a tiny proxy or running the Python script.' : '';
+            $('#ofError').text(msg + corsHint).show();
+            $st.text('');
+        } finally {
+            $btn.prop('disabled', false).text('🔍 Inspect Sample');
+        }
+    }
+
+    // Tab switching inside the inspector
+    $(document).on('click', '#ofInspectTabs .nav-link', function(e) {
+        e.preventDefault();
+        $('#ofInspectTabs .nav-link').removeClass('active');
+        $(this).addClass('active');
+        const tab = $(this).data('tab');
+        $('#ofInspectMap, #ofInspectMeta, #ofInspectRaw').hide();
+        if (tab === 'map')  $('#ofInspectMap').show();
+        if (tab === 'meta') $('#ofInspectMeta').show();
+        if (tab === 'raw')  $('#ofInspectRaw').show();
+    });
 </script>
 </body>
 </html>
